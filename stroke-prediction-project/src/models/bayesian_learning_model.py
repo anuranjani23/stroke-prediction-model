@@ -50,14 +50,14 @@ def perform_hyperparameter_tuning(X, y):
     # Using ImbPipeline to incorporate SMOTE for handling class imbalance:
     pipeline = ImbPipeline([
         ('preprocessor', preprocessor),
-        ('smote', SMOTE(sampling_strategy=0.5, random_state=42)),  # SMOTE to oversample the minority class (stroke) during training
+        ('smote', SMOTE(sampling_strategy=0.6, random_state=42)),  # SMOTE to oversample the minority class (stroke) during training
         ('feature_selection', SelectKBest(mutual_info_classif)),
         ('gnb', GaussianNB())
     ])
 
     # Grid definition for Gaussian Naive Bayes:
     param_grid = {
-        'feature_selection__k': [5, 8, 10],  # Removed 'all' as it's invalid for SelectKBest; specifies number of features
+        'feature_selection__k': [5, 6, 7, 8, 10],  # Removed 'all' as it's invalid for SelectKBest; specifies number of features
         'gnb__var_smoothing': [1e-9, 1e-8, 1e-7, 1e-6, 1e-5]  # Smoothing parameter for handling zero variance
     }
 
