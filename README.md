@@ -190,7 +190,7 @@ Based on our analysis, we recommend:
 
 ```bash
 git clone <repo-url>
-cd stroke-prediction-project
+cd stroke-prediction-project/demo
 pip install -r requirements.txt
 python app.py
 ```
@@ -214,35 +214,52 @@ Templates used:
 stroke-prediction-project
 ├── data/
 │   ├── raw/healthcare-dataset-stroke-data.csv
-│   └── processed/cleaned_dataset.csv
+│   └── processed/
+│       ├── cleaned_dataset.csv
+│       ├── X_test_processed.csv
+│       ├── X_train_resampled.csv
+│       ├── y_test.csv
+│       ├── y_trained_resampled.csv
+│       └── feature_statistics.txt
 ├── demo/
-│   ├── prediction_history.json
-│   └── stroke_model.pkl
-├── model/
-│   ├── ann_model.pkl
-│   ├── bayesian_model.pkl
-│   ├── decision_tree_model.pkl
-│   ├── knn_model.pkl
-│   ├── logistic_regression_model.pkl
-│   ├── rf_model.pkl
-│   ├── svm_model.pkl
-│   └── model_metrics.json
+|   └── data/
+│       ├── prediction_history.json
+|   └── model/
+│       ├── model_metrics.json
+│       └── stroke_model.pkl
+|   └── templates/
+│       ├── about.html
+│       ├── error.html
+│       ├── index.html
+│       └── result.html
+│   └── app.py
+│   └── requirements.txt
 ├── notebooks/
+|   ├── 01_exploratory_data_analysis.ipynb
+|   ├── 02_data_preprocessing.ipynb
+│   └── 02_model_comparison.ipynb
 ├── reports/
+│   │   ├── mid_reports
+|   |   ├── final_report
+│   │   └── images....
 ├── src/
 │   ├── models/
 │   │   ├── ann.py
+|   |   ├── ann_model.pkl
 │   │   ├── bayesian.py
+|   │   ├── bayesian_model.pkl
 │   │   ├── decision_tree.py
+|   │   ├── decision_tree_model.pkl
 │   │   ├── knn.py
+|   │   ├── knn_model.pkl
 │   │   ├── logistic_regression.py
+|   │   ├── logistic_regression_model.pkl
 │   │   ├── random_forest.py
+|   │   ├── rf_model.pkl
+|   │   ├── svm_model.pkl
 │   │   └── svm.py
-│   ├── evaluation/
 │   └── data_processing/
-├── app.py
-├── templates/
-├── requirements.txt
+│       └── cleaning.py
 └── README.md
 ```
 
