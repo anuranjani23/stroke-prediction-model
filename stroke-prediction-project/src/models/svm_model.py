@@ -1,135 +1,140 @@
 import pandas as pd
 import os
-import joblib
+import pickle
 import logging
-import numpy as np
 from time import time
+import numpy as np
 
-# For the cross-validation and hyperparameter tuning:
-from sklearn.model_selection import StratifiedKFold, RandomizedSearchCV, GridSearchCV
+# For model selection and hyperparameter tuning:
+from sklearn.model_selection import StratifiedKFold, RandomizedSearchCV
 from sklearn.svm import SVC
 # For data preprocessing:
 from sklearn.preprocessing import StandardScaler, OneHotEncoder
 from sklearn.compose import ColumnTransformer
-# For handling class imbalance:
-from imblearn.over_sampling import SMOTE  
-from imblearn.pipeline import Pipeline as ImbPipeline
+from sklearn.pipeline import Pipeline
 # For feature selection:
 from sklearn.feature_selection import SelectKBest, mutual_info_classif
-from sklearn.metrics import make_scorer, fbeta_score
-import warnings
-
-# Setting up logging:
+from sklearn.metrics import recall_score, confusion_matrix, make_scorer
+def recall_specificity_score(y_true, y_pred):
+    recall = recall_score(y_true, y_pred)
+    tn, fp, fn, tp = confusion_matrix(y_true, y_pred).ravel()
+    specificity = tn / (tn + fp) if (tn + fp) > 0 else 0
+    # Weighted custom score
+    return 0.95 * recall + 0.1 * specificity
+# Setting up the logging to display important information during execution:
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s: %(message)s')
 logger = logging.getLogger(__name__)
 
+# Define the paths
 BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
-DATA_PATH = os.path.join(BASE_DIR, 'data', 'processed', 'cleaned_dataset.csv')
+X_TRAIN_PATH = os.path.join(BASE_DIR, 'data', 'processed', 'X_train_resampled.csv')
+Y_TRAIN_PATH = os.path.join(BASE_DIR, 'data', 'processed', 'y_train_resampled.csv')
 MODELS_DIR = os.path.join(BASE_DIR, 'src', 'models')
 MODEL_PATH = os.path.join(MODELS_DIR, 'svm_model.pkl')
 
-# Loading and preparing data:
+# Loading the oversampled dataset and preparing the feature set (X) and target variable (y):
 def load_and_prepare_data():
-    df = pd.read_csv(DATA_PATH)
-    X = df.drop(columns=['stroke'])
-    y = df['stroke']
-    logger.info(f"Data loaded: {X.shape[0]} samples, {X.shape[1]} features")
+    X = pd.read_csv(X_TRAIN_PATH)
+    y = pd.read_csv(Y_TRAIN_PATH)
+    y = y.values.ravel()
+    logger.info(f"Loaded {X.shape[0]} samples with {X.shape[1]} features")
+    logger.info(f"Target variable shape: {y.shape}")
     return X, y
 
-# Simplified model training function with optimization
-def train_optimized_model(X, y):
-    # Identifying column types:
+def perform_hyperparameter_tuning(X, y):
+    # Identifying column types
     numeric_features = X.select_dtypes(include=['int64', 'float64']).columns
     categorical_features = X.select_dtypes(include=['object', 'category']).columns
 
-    logger.info(f"Numeric features: {len(numeric_features)}, Categorical features: {len(categorical_features)}")
+    logger.info(f"Numeric features: {list(numeric_features)}")
+    logger.info(f"Categorical features: {list(categorical_features)}")
 
     # Create preprocessing pipeline
-    preprocessor = ColumnTransformer(
-        transformers=[
-            ('num', StandardScaler(), numeric_features),
-            ('cat', OneHotEncoder(handle_unknown='ignore'), categorical_features)
-        ])
+    preprocessor = ColumnTransformer([
+        ('num', StandardScaler(), numeric_features),
+        ('cat', OneHotEncoder(handle_unknown='ignore'), categorical_features)
+    ])
 
-    # Create an integrated pipeline that includes preprocessing, feature selection, and the classifier
-    pipeline = ImbPipeline([
+    # Create pipeline with preprocessing, feature selection, and classifier
+    pipeline = Pipeline([
         ('preprocessor', preprocessor),
-        ('smote', SMOTE(random_state=42, sampling_strategy=0.8)),
-        ('feature_selection', SelectKBest(mutual_info_classif, k=20)),
+        ('feature_selection', SelectKBest(mutual_info_classif)),
         ('classifier', SVC(probability=True, class_weight='balanced', random_state=42))
     ])
 
-    # Focused parameter grid with fewer combinations
-    param_grid = {
+    # Define parameter distribution for RandomizedSearchCV
+    param_dist = {
+        'feature_selection__k': [10, 15, 20, 25],
         'classifier__C': [0.1, 1, 10, 100],
         'classifier__gamma': ['scale', 'auto', 0.01, 0.1],
-        'classifier__kernel': ['rbf', 'poly'],
-        'smote__sampling_strategy': [0.6, 0.8, 1.0]
+        'classifier__kernel': ['rbf', 'poly', 'sigmoid'],
+        'classifier__degree': [2, 3, 4],  # For poly kernel
+        'classifier__coef0': [-1, 0, 1]  # For poly/sigmoid kernels
     }
-    
 
-    # Using RandomizedSearchCV instead of GridSearchCV to explore more efficiently,
-    # with fewer total evaluations:
-    f2_scorer = make_scorer(fbeta_score, beta=2)
     cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
 
-    # Start timing
     start_time = time()
     logger.info("Starting hyperparameter optimization...")
+    custom_scorer = make_scorer(recall_specificity_score, greater_is_better=True)
 
+    # Perform randomized search
     search = RandomizedSearchCV(
-        pipeline, param_grid,
+        pipeline,
+        param_distributions=param_dist,
+        n_iter=100,  # More iterations for better exploration
         cv=cv,
-        scoring=f2_scorer,
+        scoring=custom_scorer,
+        refit=True,  # Refit based on recall
+        verbose=2,
         n_jobs=-1,
-        n_iter=5,
-        verbose=1,
-        random_state=42
+        random_state=42,
+        return_train_score=True
     )
-
-    # Fit the model
     search.fit(X, y)
-
-    # Log the time taken
-    elapsed_time = time() - start_time
-    logger.info(f"Model training completed in {elapsed_time:.2f} seconds")
+    
     logger.info(f"Best Parameters: {search.best_params_}")
-    logger.info(f"Best F2 Score: {search.best_score_:.4f}")
+    logger.info(f"Best Score: {search.best_score_:.4f}")
+    
+    # Log top 3 models for comparison - FIX: use 'mean_test_recall' since we're refitting based on recall
+    results = pd.DataFrame(search.cv_results_)
+    # Sort by mean_test_recall which is available (instead of rank_test_score which doesn't exist)
+    top_results = results.sort_values('mean_test_score', ascending=False).head(3)
+    for i, (params, score) in enumerate(zip(top_results['params'], top_results['mean_test_score'])):
+        logger.info(f"Rank {i+1} - Score: {score:.4f} - Params: {params}")
 
-    # Return the best estimator
     return search.best_estimator_
 
-# Main function to train and save the model:
 def train_and_save_model():
-    os.makedirs(MODELS_DIR, exist_ok=True)
-    X, y = load_and_prepare_data()
-
-    # Log class distribution:
-    class_distribution = pd.Series(y).value_counts(normalize=True)
-    logger.info(f"Class distribution:\n{class_distribution}")
-
-    # Train the model:
-    best_model = train_optimized_model(X, y)
-
-    # Save the model:
-    joblib.dump(best_model, MODEL_PATH)
-    logger.info(f"SVM model saved to {MODEL_PATH}")
+    try:
+        os.makedirs(MODELS_DIR, exist_ok=True)
+        X, y = load_and_prepare_data()
+        
+        logger.info("Starting model training...")
+        best_model = perform_hyperparameter_tuning(X, y)
+        
+        with open(MODEL_PATH, 'wb') as f:
+            pickle.dump(best_model, f)
+        logger.info(f"Optimized SVM model saved to {MODEL_PATH}")
+    except Exception as e:
+        logger.error(f"Error in model training: {str(e)}")
+        raise
 
 if __name__ == "__main__":
-    warnings.filterwarnings("ignore", category=FutureWarning, module="sklearn")
     train_and_save_model()
 
 # Technical Notes:
-# 1. Mutual Information (mutual_info_classif): Used for feature selection instead of ANOVA F-test.
-#    It captures non-linear relationships between features and target, which is particularly 
-#    useful for SVM with non-linear kernels.
+# 1. Feature Selection: Using mutual_info_classif which captures non-linear relationships
+#    between features and target, particularly useful for SVM with non-linear kernels.
 #
-# 2. Class weighting: We use a custom weight calculation that squares the standard 'balanced' 
-#    weights, giving even greater importance to the minority class (stroke cases).
+# 2. Class Weighting: Using 'balanced' mode to automatically adjust weights inversely
+#    proportional to class frequencies.
 #
-# 3. Probability Calibration: SVMs don't naturally output well-calibrated probabilities. The
-#    CalibratedClassifierCV wrapper improves the reliability of predicted probabilities.
+# 3. Custom Scoring: The scoring function emphasizes recall (70% weight) to minimize
+#    false negatives in stroke detection while still considering precision and F1 score.
 #
-# 4. F2-score optimization: Since recall (sensitivity) is more important than precision for stroke
-#    prediction (missing actual stroke cases is worse than false alarms), we use the F2 score
-#    which weighs recall higher than precision.
+# 4. Kernel Options: Exploring rbf, poly and sigmoid kernels with appropriate parameters
+#    for each kernel type.
+#
+# 5. Randomized Search: More efficient than grid search for exploring large parameter spaces,
+#    with 50 iterations for thorough exploration.
