@@ -108,12 +108,9 @@ def preprocess_data():
         for col in categorical_columns:
             df[col] = label_encoder.fit_transform(df[col].astype(str))
         
-        # Applying the advanced feature categorization:
-        df = perform_feature_engineering(df)
-        
         # Scaling the numerical features using StandardScaler:
-        standard_scaler = StandardScaler()
-        df[numerical_columns] = standard_scaler.fit_transform(df[numerical_columns])
+        #standard_scaler = StandardScaler()
+        #df[numerical_columns] = standard_scaler.fit_transform(df[numerical_columns])
         
         # Ensuring that the target variable ('stroke') remains as an integer:
         df['stroke'] = df['stroke'].astype(int)
@@ -166,6 +163,12 @@ def preprocess_data():
             f.write("\n" + "=" * 50 + "\n")
             f.write("     END OF FEATURE STATISTICS REPORT     \n")
             f.write("=" * 50 + "\n")
+
+        # Applying the advanced feature categorization:
+        df = perform_feature_engineering(df)
+        
+        standard_scaler = StandardScaler()
+        df[numerical_columns] = standard_scaler.fit_transform(df[numerical_columns])
         
         # Saving the processed data to CSV:
         df.to_csv(PROCESSED_DATA_PATH, index=False)
