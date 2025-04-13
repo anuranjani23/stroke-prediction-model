@@ -1,38 +1,46 @@
 import pandas as pd  
 import os  
-import joblib  
+import pickle 
 import logging  
 import numpy as np  
 
 # For model selection and hyperparameter tuning:
-from sklearn.model_selection import RepeatedStratifiedKFold, GridSearchCV  
+from sklearn.model_selection import RepeatedStratifiedKFold, RandomizedSearchCV 
 from sklearn.linear_model import LogisticRegression  # Logistic Regression classifier.
 from sklearn.preprocessing import OneHotEncoder, PowerTransformer  # For encoding and scaling.
 from sklearn.compose import ColumnTransformer  # For applying different preprocessing to different feature types.
-from sklearn.metrics import make_scorer, recall_score, precision_score  
 
-# Handling class imbalance and creating a pipeline that supports imbalanced learning:
-from imblearn.combine import SMOTETomek  # SMOTE + Tomek Links for resampling.
-from imblearn.pipeline import Pipeline as ImbPipeline  # Pipeline compatible with imbalanced-learn.
+from sklearn.metrics import make_scorer  # For custom scoring functions.
+# Creating a pipeline:
+from sklearn.pipeline import Pipeline  # Standard scikit-learn pipeline.
+from sklearn.metrics import recall_score, confusion_matrix, make_scorer
 
-# Setting up logging configuration:
+def recall_specificity_score(y_true, y_pred):
+    recall = recall_score(y_true, y_pred)
+    tn, fp, fn, tp = confusion_matrix(y_true, y_pred).ravel()
+    specificity = tn / (tn + fp) if (tn + fp) > 0 else 0
+    # Weighted custom score
+    return 0.8 * recall + 0.35 * specificity
+
+# Setting up the logging to display important information during execution:
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s: %(message)s')
-logger = logging.getLogger(__name__)  
+logger = logging.getLogger(__name__)
 
-# Defining paths for dataset and saving models:
+# Define the paths
 BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
-DATA_PATH = os.path.join(BASE_DIR, 'data', 'processed', 'cleaned_dataset.csv')  
-MODELS_DIR = os.path.join(BASE_DIR, 'src', 'models')  
+X_TRAIN_PATH = os.path.join(BASE_DIR, 'data', 'processed', 'X_train_resampled.csv')
+Y_TRAIN_PATH = os.path.join(BASE_DIR, 'data', 'processed', 'y_train_resampled.csv')
+MODELS_DIR = os.path.join(BASE_DIR, 'src', 'models') 
 MODEL_PATH = os.path.join(MODELS_DIR, 'logistic_regression_model.pkl')  
 
-# Function to load dataset and split it into features (X) and target (y):
+# Loading the oversampled dataset and preparing the feature set (X) and target variable (y):
 def load_and_prepare_data():
-    df = pd.read_csv(DATA_PATH)  
-    X = df.drop(columns=['stroke'])  
-    y = df['stroke']  
+    X = pd.read_csv(X_TRAIN_PATH)
+    y = pd.read_csv(Y_TRAIN_PATH)
+    y = y.values.ravel()
     logger.info(f"Loaded {X.shape[0]} samples with {X.shape[1]} features")
+    logger.info(f"Target variable shape: {y.shape}")
     return X, y
-
 
 # Function to perform model training with GridSearchCV and hyperparameter tuning:
 def perform_hyperparameter_tuning(X, y):
@@ -43,42 +51,59 @@ def perform_hyperparameter_tuning(X, y):
     # Preprocessing pipeline: scaling numeric features, one-hot encoding categorical ones
     preprocessor = ColumnTransformer([
         ('num', PowerTransformer(), numeric),
-        ('cat', OneHotEncoder(handle_unknown='ignore'), categorical)
+        ('cat', OneHotEncoder(handle_unknown='ignore', sparse_output=False), categorical)
     ])
 
-    # Creating a pipeline with preprocessing, SMOTETomek resampling, and logistic regression
-    pipeline = ImbPipeline([
+    # Creating a pipeline with preprocessing and logistic regression
+    pipeline = Pipeline([
         ('preprocessor', preprocessor),
-        ('sampling', SMOTETomek(random_state=42)),  # Resample data to handle class imbalance
-        ('classifier', LogisticRegression(max_iter=6000, random_state=42, tol=1e-5))  # Main classifier
+        ('classifier', LogisticRegression(max_iter=1000))  # Main classifier
     ])
 
     # Defining hyperparameter grid for GridSearchCV:
     param_grid = [
         {
-            'classifier__C': np.logspace(-3, 3, 4),  # Inverse regularization strength
-            'classifier__penalty': ['l2'],  # Regularization type
-            'classifier__solver': ['lbfgs', 'liblinear'],  # Solvers that support L2
-            'classifier__class_weight': ['balanced', {0: 1, 1: 10}]  # Class weight options
+            'classifier__C': [0.1, 1, 10],
+            'classifier__penalty': ['l2'],
+            'classifier__solver': ['lbfgs', 'liblinear'],
+            'classifier__class_weight': ['balanced', {0: 1, 1: 10}]
         },
         {
-            'classifier__C': np.logspace(-3, 3, 4),
-            'classifier__penalty': ['l1'],  # L1 penalty requires liblinear solver
+            'classifier__C': [0.1, 1, 10],
+            'classifier__penalty': ['l1'],
             'classifier__solver': ['liblinear'],
             'classifier__class_weight': ['balanced', {0: 1, 1: 10}]
         }
     ]
 
     # Using repeated stratified k-fold for more robust evaluation
-    cv = RepeatedStratifiedKFold(n_splits=7, n_repeats=3, random_state=42)
-
+    cv = RepeatedStratifiedKFold(n_splits=5, n_repeats=3, random_state=42)
+    custom_score = make_scorer(recall_specificity_score)  # Custom scoring function to balance recall and roc_auc
     # Running the grid search
     logger.info("Starting logistic regression tuning with GridSearchCV...")
-    search = GridSearchCV(pipeline, param_grid, scoring='f1', cv=cv, n_jobs=-1, verbose=1)
+    search = RandomizedSearchCV(
+        pipeline,
+        param_distributions=param_grid,
+        n_iter=100,  # Reduced to speed up without losing much performance
+        cv=cv,
+        scoring=custom_score,
+        refit=True,  # Refit based on f1
+        verbose=2,
+        n_jobs=-1,
+        random_state=42,
+        return_train_score=True
+    )
     search.fit(X, y)  # Train and validate models across grid
 
     best_model = search.best_estimator_
     logger.info(f"Best parameters: {search.best_params_}")  # Log the best combination found
+    logger.info(f"Best score: {search.best_score_:.4f}")  # Log the best score achieved
+
+    # Log top 3 models for comparison (based on custom score)
+    results = pd.DataFrame(search.cv_results_)
+    top_results = results.sort_values('rank_test_score').head(3)
+    for i, (params, score) in enumerate(zip(top_results['params'], top_results['mean_test_score'])):
+        logger.info(f"Rank {i+1} - Custom Score: {score:.4f} - Params: {params}")
 
     return best_model  # Return the optimized model
 
@@ -88,25 +113,13 @@ def train_and_save_model():
         os.makedirs(MODELS_DIR, exist_ok=True)  # Ensure the models directory exists
         X, y = load_and_prepare_data()  # Load dataset
         model = perform_hyperparameter_tuning(X, y)  # Train and tune model
-        joblib.dump(model, MODEL_PATH)  # Save the trained model
+        with open(f"{MODEL_PATH}", 'wb') as f:
+            pickle.dump(model, f)
         logger.info(f"Saved optimized logistic regression model to {MODEL_PATH}")
-        loaded_model = joblib.load(MODEL_PATH)  # Load back to confirm it was saved correctly
         logger.info("Successfully verified model loading")
     except Exception as e:
         logger.error(f"Error saving model: {str(e)}")
         raise
 
-# Function to load the saved model for inference or further evaluation:
-def load_model():
-    try:
-        model = joblib.load(MODEL_PATH)  # Load the saved model
-        return model
-    except Exception as e:
-        logger.error(f"Error loading model: {str(e)}")
-        raise
-
 if __name__ == "__main__":
     train_and_save_model()
-
-# SMOTETomek is a combination of SMOTE (oversampling the minority class) and Tomek Links (undersampling the majority class by removing borderline examples). Together, they balance the dataset more effectively for imbalanced classification problems.
-# PowerTransformer is a preprocessing method that applies a power transformation to make data more Gaussian-like. This can improve the performance of linear models like logistic regression by stabilizing variance and minimizing skewness.
