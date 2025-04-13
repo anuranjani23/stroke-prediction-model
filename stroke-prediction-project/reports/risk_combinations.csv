@@ -1,0 +1,6 @@
+Combination,Cases,Stroke_Rate
+Elderly + Hypertension + High Glucose,100,25.0
+Elderly + Heart Disease + Smoker,85,21.176470588235293
+Hypertension + High Glucose + Obese,114,15.789473684210526
+Elderly + Hypertension + Heart Disease,45,24.444444444444443
+Elderly + Obese + Smoker,164,12.195121951219512
