@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About | Stroke Risk Predictor</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.0/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --primary-color: #4361ee;
+            --secondary-color: #3a0ca3;
+            --accent-color: #4895ef;
+            --light-bg: #f8fafc;
+            --dark-text: #1e293b;
+            --light-text: #f8fafc;
+            --border-radius: 12px;
+            --box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+            --transition: all 0.3s ease;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f6f9fc 0%, #eef1f5 100%);
+            color: var(--dark-text);
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            line-height: 1.6;
+        }
+        
+        .navbar {
+            background: linear-gradient(90deg, #3a0ca3 0%, #4361ee 100%) !important;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            padding: 12px 0;
+        }
+        
+        .navbar-brand {
+            font-weight: 600;
+            font-size: 1.3rem;
+            letter-spacing: 0.5px;
+        }
+        
+        .nav-link {
+            font-weight: 500;
+            transition: var(--transition);
+            position: relative;
+            padding: 8px 16px !important;
+            margin: 0 4px;
+        }
+        
+        .nav-link.active::after {
+            content: '';
+            position: absolute;
+            width: 60%;
+            height: 3px;
+            background-color: white;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            border-radius: 2px;
+        }
+        
+        .nav-link:hover:not(.active) {
+            transform: translateY(-2px);
+        }
+        
+        .card {
+            border: none;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            transition: var(--transition);
+            overflow: hidden;
+            background-color: white;
+            margin-bottom: 2rem;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+        }
+        
+        .custom-header {
+            background: linear-gradient(135deg, #4361ee 0%, #3a0ca3 100%);
+            color: white;
+            padding: 28px 24px;
+            border-radius: var(--border-radius) var(--border-radius) 0 0;
+            position: relative;
+        }
+        
+        .custom-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 150px;
+            height: 150px;
+            background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M50 0 L100 50 L50 100 L0 50 Z' fill='rgba(255,255,255,0.1)'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-size: cover;
+            opacity: 0.5;
+        }
+        
+        .custom-header h2 {
+            font-weight: 700;
+            margin-bottom: 8px;
+            font-size: 1.8rem;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .section-title {
+            color: var(--primary-color);
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e2e8f0;
+            position: relative;
+        }
+        
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 60px;
+            height: 2px;
+            background-color: var(--primary-color);
+        }
+        
+        .feature-icon {
+            width: 4.5rem;
+            height: 4.5rem;
+            border-radius: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.25rem;
+            color: white;
+            margin: 0 auto 1rem;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+            transition: var(--transition);
+        }
+        
+        .card:hover .feature-icon {
+            transform: scale(1.1) rotate(5deg);
+        }
+        
+        .bg-primary-gradient {
+            background: linear-gradient(135deg, #4361ee 0%, #3a0ca3 100%);
+        }
+        
+        .bg-success-gradient {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        }
+        
+        .bg-danger-gradient {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        }
+        
+        .bg-warning-gradient {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        }
+        
+        .info-card {
+            height: 100%;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .info-card::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(67, 97, 238, 0.05) 0%, rgba(58, 12, 163, 0.05) 100%);
+            top: 0;
+            left: 0;
+            opacity: 0;
+            transition: var(--transition);
+            z-index: -1;
+        }
+        
+        .info-card:hover::after {
+            opacity: 1;
+        }
+        
+        .model-card {
+            border-left: 4px solid var(--primary-color);
+            transition: var(--transition);
+        }
+        
+        .model-card:hover {
+            background-color: #f8fafc;
+        }
+        
+        .notice-card {
+            background-color: #ebf5ff;
+            border-left: 4px solid var(--primary-color);
+        }
+        
+        .notice-icon {
+            color: var(--primary-color);
+            font-size: 1.8rem;
+        }
+        
+        footer {
+            background: linear-gradient(90deg, #3a0ca3 0%, #4361ee 100%);
+            padding: 24px 0;
+            box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        footer p {
+            font-weight: 500;
+            letter-spacing: 0.5px;
+        }
+        
+        /* Animation */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .animate {
+            opacity: 0;
+            animation: fadeInUp 0.6s ease-out forwards;
+        }
+        
+        .delay-1 { animation-delay: 0.1s; }
+        .delay-2 { animation-delay: 0.2s; }
+        .delay-3 { animation-delay: 0.3s; }
+        .delay-4 { animation-delay: 0.4s; }
+        .delay-5 { animation-delay: 0.5s; }
+        
+        /* Pulse animation for stroke icon */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .pulse-animation {
+            animation: pulse 2s infinite ease-in-out;
+        }
+        
+        /* Statistic counters */
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-label {
+            color: #64748b;
+            font-weight: 500;
+        }
+        
+        .stat-card {
+            padding: 1.5rem;
+            border-radius: var(--border-radius);
+            background-color: white;
+            box-shadow: var(--box-shadow);
+            text-align: center;
+            height: 100%;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="bi bi-heart-pulse-fill me-2"></i>Stroke Risk Predictor
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/"><i class="bi bi-house-door me-1"></i>Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/history"><i class="bi bi-clock-history me-1"></i>History</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/about"><i class="bi bi-info-circle me-1"></i>About</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container my-5">
+        <div class="card mb-5 animate delay-1">
+            <div class="custom-header">
+                <h2><i class="bi bi-info-circle me-2"></i>About The Stroke Risk Predictor</h2>
+                <p class="mb-0 mt-2 opacity-90">Understanding our risk assessment tool and how it works</p>
+            </div>
+            
+            <div class="card-body p-4">
+                <div class="row mb-5 align-items-center">
+                    <div class="col-lg-8 animate delay-2">
+                        <h3 class="section-title">Understanding Stroke Risk</h3>
+                        <p>A stroke occurs when blood flow to part of the brain is interrupted or reduced, preventing brain tissue from getting oxygen and nutrients. Brain cells begin to die within minutes, making stroke a medical emergency that requires immediate attention.</p>
+                        <p>According to the World Health Organization, stroke is the second leading cause of death globally and a major cause of disability. Early identification of risk factors and preventive measures can significantly reduce the incidence of stroke.</p>
+                        <p>This application leverages machine learning technology to assess an individual's risk of stroke based on various health and demographic factors. The prediction is based on a K-Nearest Neighbors (KNN) model trained on historical patient data, allowing for personalized risk assessment.</p>
+                    </div>
+                    <div class="col-lg-4 text-center d-flex align-items-center justify-content-center animate delay-3">
+                        <div class="pulse-animation">
+                            <i class="bi bi-heart-pulse" style="font-size: 8rem; color: #4361ee; opacity: 0.8;"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row mb-5 animate delay-3">
+                    <div class="col-12">
+                        <h3 class="section-title">Stroke Statistics</h3>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-card">
+                            <i class="bi bi-clipboard-data mb-3" style="font-size: 2rem; color: #4361ee;"></i>
+                            <div class="stat-number">13M</div>
+                            <div class="stat-label">New stroke cases annually worldwide</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-card">
+                            <i class="bi bi-clock-history mb-3" style="font-size: 2rem; color: #4361ee;"></i>
+                            <div class="stat-number">5.5M</div>
+                            <div class="stat-label">Deaths from stroke each year</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-card">
+                            <i class="bi bi-shield-fill-check mb-3" style="font-size: 2rem; color: #4361ee;"></i>
+                            <div class="stat-number">80%</div>
+                            <div class="stat-label">Of strokes are preventable</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-card">
+                            <i class="bi bi-stopwatch mb-3" style="font-size: 2rem; color: #4361ee;"></i>
+                            <div class="stat-number">1 in 4</div>
+                            <div class="stat-label">Adults over 25 will have a stroke in their lifetime</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <hr class="my-5">
+                
+                <div class="animate delay-4">
+                    <h3 class="section-title">Key Risk Factors for Stroke</h3>
+                    <div class="row g-4">
+                        <div class="col-md-6 col-lg-3">
+                            <div class="card h-100 border-0 info-card">
+                                <div class="card-body text-center">
+                                    <div class="feature-icon bg-primary-gradient mb-3 mx-auto">
+                                        <i class="bi bi-calendar"></i>
+                                    </div>
+                                    <h5 class="fw-bold">Age</h5>
+                                    <p class="text-muted">Stroke risk doubles each decade after age 55. While strokes can occur at any age, the risk increases significantly with advancing years due to natural changes in blood vessels and heart function.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-lg-3">
+                            <div class="card h-100 border-0 info-card">
+                                <div class="card-body text-center">
+                                    <div class="feature-icon bg-danger-gradient mb-3 mx-auto">
+                                        <i class="bi bi-activity"></i>
+                                    </div>
+                                    <h5 class="fw-bold">Hypertension</h5>
+                                    <p class="text-muted">High blood pressure damages blood vessels over time, making them more likely to rupture or become blocked. It's the single most important modifiable risk factor for stroke.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-lg-3">
+                            <div class="card h-100 border-0 info-card">
+                                <div class="card-body text-center">
+                                    <div class="feature-icon bg-warning-gradient mb-3 mx-auto">
+                                        <i class="bi bi-droplet"></i>
+                                    </div>
+                                    <h5 class="fw-bold">Glucose Levels</h5>
+                                    <p class="text-muted">Diabetes and elevated blood sugar significantly increase stroke risk by damaging blood vessels and promoting atherosclerosis. Effective blood sugar management reduces this risk substantially.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-lg-3">
+                            <div class="card h-100 border-0 info-card">
+                                <div class="card-body text-center">
+                                    <div class="feature-icon bg-success-gradient mb-3 mx-auto">
+                                        <i class="bi bi-heart"></i>
+                                    </div>
+                                    <h5 class="fw-bold">Heart Disease</h5>
+                                    <p class="text-muted">Heart conditions like atrial fibrillation can lead to blood clots that may travel to the brain and cause an ischemic stroke. Proper heart health management is essential for stroke prevention.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <hr class="my-5">
+                
+                <div class="animate delay-5">
+                    <h3 class="section-title">About Our Model</h3>
+                    <div class="row g-4">
+                        <div class="col-lg-6">
+                            <div class="card mb-3 model-card">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center mb-3">
+                                        <i class="bi bi-graph-up text-primary me-3 fs-3"></i>
+                                        <h5 class="mb-0 fw-bold">The KNN Algorithm</h5>
+                                    </div>
+                                    <p>Our application employs the K-Nearest Neighbors (KNN) algorithm, selected after evaluating multiple metrics including ROC-AUC, F1 score, and Recall. KNN predicts stroke risk by analyzing how similar a patient's health profile is to known cases in our training dataset.</p>
+                                    <p>This model was chosen for its strong performance in healthcare predictions, interpretability, and ability to handle mixed data types effectively. The algorithm works by identifying the most similar historical cases and using them to make predictions about new patients.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="card mb-3 model-card">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center mb-3">
+                                        <i class="bi bi-clipboard-data text-primary me-3 fs-3"></i>
+                                        <h5 class="mb-0 fw-bold">Data and Features</h5>
+                                    </div>
+                                    <p>The prediction model analyzes ten critical factors proven to be associated with stroke risk:</p>
+                                    <div class="row mt-2">
+                                        <div class="col-md-6">
+                                            <ul class="mb-0">
+                                                <li>Age</li>
+                                                <li>Average glucose level</li>
+                                                <li>BMI (Body Mass Index)</li>
+                                                <li>Hypertension status</li>
+                                                <li>Heart disease history</li>
+                                            </ul>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <ul class="mb-0">
+                                                <li>Gender</li>
+                                                <li>Marital status</li>
+                                                <li>Work type</li>
+                                                <li>Residence type</li>
+                                                <li>Smoking status</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card bg-light mt-4 notice-card">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center mb-3">
+                                <i class="bi bi-exclamation-triangle-fill notice-icon me-3"></i>
+                                <h5 class="mb-0 fw-bold">Medical Disclaimer</h5>
+                            </div>
+                            <p class="mb-0">This tool is for informational purposes only and should not replace professional medical advice, diagnosis, or treatment. The predictions made by this application are based on statistical models and may not apply to every individual. Always consult with a qualified healthcare provider regarding any medical conditions or concerns.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card animate delay-5">
+            <div class="card-body p-4">
+                <h3 class="section-title">Get in Touch</h3>
+                <p>If you have questions about this tool or would like to learn more about stroke prevention, please don't hesitate to contact our team. We're committed to improving health outcomes through technology and education.</p>
+                <div class="text-center mt-4">
+                    <a href="/contact" class="btn btn-primary me-3">
+                        <i class="bi bi-envelope me-2"></i>Contact Us
+                    </a>
+                    <a href="/resources" class="btn btn-outline-primary">
+                        <i class="bi bi-journal-text me-2"></i>Educational Resources
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="text-white py-4 mt-5">
+        <div class="container text-center">
+            <p class="mb-2">© 2025 Stroke Risk Predictor | Developed for Health Monitoring</p>
+            <div class="mt-2">
+                <a href="/privacy" class="text-white-50 text-decoration-none me-3">Privacy Policy</a>
+                <a href="/terms" class="text-white-50 text-decoration-none me-3">Terms of Use</a>
+                <a href="/contact" class="text-white-50 text-decoration-none">Contact Us</a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Animation for statistics
+            function animateValue(obj, start, end, duration) {
+                let startTimestamp = null;
+                const step = (timestamp) => {
+                    if (!startTimestamp) startTimestamp = timestamp;
+                    const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                    if (typeof end === 'string' && end.includes('M')) {
+                        const value = Math.floor(progress * (parseFloat(end) * 1000000));
+                        obj.innerHTML = (value / 1000000).toFixed(1) + 'M';
+                    } else if (typeof end === 'string' && end.includes('%')) {
+                        const value = Math.floor(progress * parseInt(end));
+                        obj.innerHTML = value + '%';
+                    } else if (typeof end === 'string' && end.includes('in')) {
+                        obj.innerHTML = end;
+                    } else {
+                        obj.innerHTML = Math.floor(progress * end);
+                    }
+                    if (progress < 1) {
+                        window.requestAnimationFrame(step);
+                    }
+                };
+                window.requestAnimationFrame(step);
+            }
+            
+            // Helper function to check if element is in viewport
+            function isInViewport(element) {
+                const rect = element.getBoundingClientRect();
+                return (
+                    rect.top >= 0 &&
+                    rect.left >= 0 &&
+                    rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
+                    rect.right <= (window.innerWidth || document.documentElement.clientWidth)
+                );
+            }
+
+            // Initialize animations when elements come into view
+            const statNumbers = document.querySelectorAll('.stat-number');
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const target = entry.target;
+                        const value = target.textContent;
+                        if (value.includes('M')) {
+                            animateValue(target, 0, value, 2000);
+                        } else if (value.includes('%')) {
+                            animateValue(target, 0, value, 2000);
+                        } else if (value.includes('in')) {
+                            // Do nothing for "1 in 4" format
+                        } else {
+                            animateValue(target, 0, parseInt(value), 2000);
+                        }
+                        observer.unobserve(target);
+                    }
+                });
+            }, { threshold: 0.1 });
+            
+            statNumbers.forEach(number => {
+                observer.observe(number);
+            });
+            
+            // Animation for elements
+            const animateElements = document.querySelectorAll('.animate');
+            
+            const elementObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.animationPlayState = 'running';
+                        elementObserver.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.1 });
+            
+            animateElements.forEach(element => {
+                element.style.animationPlayState = 'paused';
+                elementObserver.observe(element);
+            });
+        });
+    </script>
+</body>
+</html>

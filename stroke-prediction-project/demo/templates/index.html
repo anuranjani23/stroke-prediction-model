@@ -1,0 +1,931 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stroke Risk Predictor</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.0/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --primary-color: #4361ee;
+            --secondary-color: #3f37c9;
+            --accent-color: #4895ef;
+            --light-bg: #f8fafc;
+            --dark-text: #1e293b;
+            --light-text: #f8fafc;
+            --border-radius: 12px;
+            --box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+            --transition: all 0.3s ease;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f6f9fc 0%, #eef1f5 100%);
+            color: var(--dark-text);
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            line-height: 1.6;
+        }
+        
+        .navbar {
+            background: linear-gradient(90deg, #3a0ca3 0%, #4361ee 100%) !important;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            padding: 12px 0;
+        }
+        
+        .navbar-brand {
+            font-weight: 600;
+            font-size: 1.3rem;
+            letter-spacing: 0.5px;
+        }
+        
+        .nav-link {
+            font-weight: 500;
+            transition: var(--transition);
+            position: relative;
+            padding: 8px 16px !important;
+            margin: 0 4px;
+        }
+        
+        .nav-link.active::after {
+            content: '';
+            position: absolute;
+            width: 60%;
+            height: 3px;
+            background-color: white;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            border-radius: 2px;
+        }
+        
+        .nav-link:hover:not(.active) {
+            transform: translateY(-2px);
+        }
+        
+        .card {
+            border: none;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            transition: var(--transition);
+            overflow: hidden;
+            background-color: white;
+            margin-bottom: 2rem;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+        }
+        
+        .custom-header {
+            background: linear-gradient(135deg, #4361ee 0%, #3a0ca3 100%);
+            color: white;
+            padding: 28px 24px;
+            border-radius: var(--border-radius) var(--border-radius) 0 0;
+            position: relative;
+        }
+        
+        .custom-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 150px;
+            height: 150px;
+            background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M50 0 L100 50 L50 100 L0 50 Z' fill='rgba(255,255,255,0.1)'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-size: cover;
+            opacity: 0.5;
+        }
+        
+        .custom-header h2 {
+            font-weight: 700;
+            margin-bottom: 8px;
+            font-size: 1.8rem;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .card-body {
+            padding: 2rem;
+        }
+        
+        .form-label {
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: #334155;
+        }
+        
+        .form-control, .form-select {
+            border-radius: 8px;
+            padding: 10px 16px;
+            border: 1px solid #cbd5e1;
+            transition: var(--transition);
+        }
+        
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.25);
+        }
+        
+        .input-group {
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .input-group-text {
+            background-color: #f1f5f9;
+            border-color: #cbd5e1;
+            color: #64748b;
+            font-weight: 500;
+        }
+        
+        .form-group {
+            margin-bottom: 1.75rem;
+        }
+        
+        .info-tooltip {
+            cursor: pointer;
+            color: #64748b;
+            transition: var(--transition);
+            font-size: 1.1rem;
+        }
+        
+        .info-tooltip:hover {
+            color: var(--primary-color);
+        }
+        
+        .required-field::after {
+            content: "*";
+            color: #ef4444;
+            margin-left: 5px;
+        }
+        
+        .section-title {
+            color: var(--primary-color);
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #e2e8f0;
+            position: relative;
+        }
+        
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 60px;
+            height: 2px;
+            background-color: var(--primary-color);
+        }
+        
+        .form-check-input:checked {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #4361ee 0%, #3a0ca3 100%);
+            border: none;
+            border-radius: 8px;
+            padding: 12px 24px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(67, 97, 238, 0.3);
+        }
+        
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: 0.5s;
+        }
+        
+        .btn-primary:hover::before {
+            left: 100%;
+        }
+        
+        .notice-card {
+            background-color: #ebf5ff;
+            border-left: 4px solid var(--primary-color);
+        }
+        
+        .notice-icon {
+            color: var(--primary-color);
+            font-size: 1.8rem;
+        }
+        
+        footer {
+            background: linear-gradient(90deg, #3a0ca3 0%, #4361ee 100%);
+            padding: 24px 0;
+            box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        footer p {
+            font-weight: 500;
+            letter-spacing: 0.5px;
+        }
+        
+        .alert {
+            border-radius: var(--border-radius);
+            border: none;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+        
+        hr {
+            opacity: 0.15;
+            margin: 2rem 0;
+        }
+        
+        /* Form section animations */
+        .form-section {
+            animation: fadeIn 0.6s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Radio button styling */
+        .radio-card {
+            display: flex;
+            margin-bottom: 0;
+        }
+        
+        .radio-card .form-check-input {
+            margin-top: 0.2rem;
+        }
+        
+        /* Progress indicator */
+        .progress-container {
+            background-color: #f1f5f9;
+            height: 8px;
+            border-radius: 4px;
+            margin-bottom: 2rem;
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #4361ee, #3a0ca3);
+            width: 0;
+            transition: width 0.3s ease;
+            border-radius: 4px;
+        }
+        
+        /* Tooltip custom styling */
+        .tooltip .tooltip-inner {
+            background-color: #1e293b;
+            border-radius: 6px;
+            padding: 10px 15px;
+            max-width: 300px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+        
+        .tooltip .arrow::before {
+            border-top-color: #1e293b;
+        }
+        
+        /* Model & Clinical Context sections */
+        .model-card {
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .model-card:hover {
+            border-color: var(--primary-color);
+            box-shadow: 0 5px 15px rgba(67, 97, 238, 0.1);
+        }
+        
+        .model-card.selected {
+            border-color: var(--primary-color);
+            background-color: rgba(67, 97, 238, 0.05);
+            box-shadow: 0 5px 15px rgba(67, 97, 238, 0.15);
+        }
+        
+        .context-badge {
+            font-size: 0.8rem;
+            padding: 5px 10px;
+            border-radius: 20px;
+            margin-right: 10px;
+            background-color: #f1f5f9;
+            color: #64748b;
+            transition: all 0.3s ease;
+        }
+        
+        .context-badge.selected {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .recommendation-box {
+            background-color: #f8fafc;
+            border-left: 3px solid var(--accent-color);
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 8px;
+            animation: fadeIn 0.5s ease-out;
+        }
+        
+        .model-metrics {
+            font-size: 0.85rem;
+            color: #64748b;
+        }
+        
+        .metric-value {
+            font-weight: 600;
+            color: var(--dark-text);
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="bi bi-heart-pulse-fill me-2"></i>Stroke Risk Predictor
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/"><i class="bi bi-house-door me-1"></i>Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/history"><i class="bi bi-clock-history me-1"></i>History</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/about"><i class="bi bi-info-circle me-1"></i>About</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container my-5">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <div class="card mb-4">
+            <div class="custom-header">
+                <h2><i class="bi bi-clipboard-pulse me-2"></i>Stroke Risk Assessment</h2>
+                <p class="mb-0 mt-2 opacity-75">Complete the form below with patient information for an accurate risk prediction</p>
+            </div>
+            
+            <div class="card-body p-4">
+                <div class="progress-container">
+                    <div class="progress-bar" id="formProgress" style="width: 0%"></div>
+                </div>
+                
+                <form method="POST" action="/predict" id="predictionForm">
+                    <!-- NEW SECTION: Clinical Context -->
+                    <div class="row form-section">
+                        <div class="col-12">
+                            <h4 class="section-title"><i class="bi bi-hospital me-2"></i>Clinical Context</h4>
+                            <p class="text-muted mb-3">Select the appropriate clinical setting to optimize the model recommendation</p>
+                            
+                            <div class="row">
+                                {% for context_id, context in clinical_contexts.items() %}
+                                <div class="col-md-6 mb-3">
+                                    <div class="model-card p-3" onclick="selectContext('{{ context_id }}')">
+                                        <div class="d-flex align-items-center mb-2">
+                                            <input type="radio" name="context_id" id="context_{{ context_id }}" value="{{ context_id }}" class="form-check-input form-field me-2" {% if context_id == 'general' %}checked{% endif %}>
+                                            <label for="context_{{ context_id }}" class="form-check-label fw-bold mb-0">{{ context.name }}</label>
+                                        </div>
+                                        <p class="text-muted small mb-2">{{ context.description }}</p>
+                                        <div class="small text-primary">
+                                            <i class="bi bi-check-circle-fill me-1"></i>Recommended: {{ models[context.recommended_model].name }}
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- NEW SECTION: Model Selection -->
+                    <div class="row form-section mt-4">
+                        <div class="col-12">
+                            <h4 class="section-title"><i class="bi bi-cpu me-2"></i>Prediction Model</h4>
+                            <p class="text-muted mb-3">Choose a model or accept the recommended one based on your clinical context</p>
+                            
+                            <div class="recommendation-box" id="modelRecommendation">
+                                <div class="d-flex align-items-center mb-2">
+                                    <i class="bi bi-lightbulb-fill text-warning me-2"></i>
+                                    <strong>Recommended Model: </strong>
+                                    <span id="recommendedModelName" class="ms-2">K-Nearest Neighbors</span>
+                                </div>
+                                <p class="small mb-0" id="recommendationExplanation">
+                                    KNN has the highest sensitivity (94.7%) and ROC AUC (95.9%), ensuring minimal missed stroke cases. This is crucial in emergency settings where missing a stroke case could be fatal.
+                                </p>
+                            </div>
+                            
+                            <div class="row mt-4">
+                                {% for model_id, model in models.items() %}
+                                <div class="col-md-6 mb-3">
+                                    <div class="model-card" onclick="selectModel('{{ model_id }}')">
+                                        <div class="d-flex align-items-center mb-2">
+                                            <input type="radio" name="model_id" id="model_{{ model_id }}" value="{{ model_id }}" class="form-check-input form-field me-2" {% if model_id == 'knn' %}checked{% endif %}>
+                                            <label for="model_{{ model_id }}" class="form-check-label fw-bold mb-0">{{ model.name }}</label>
+                                        </div>
+                                        <p class="text-muted small mb-0">{{ model.best_for }}</p>
+                                        <div class="d-flex flex-wrap mt-2 model-metrics">
+                                            <div class="me-3"><span class="metric-value">{{ "%.1f"|format(model.metrics.accuracy*100) }}%</span> Accuracy</div>
+                                            <div class="me-3"><span class="metric-value">{{ "%.1f"|format(model.metrics.recall*100) }}%</span> Sensitivity</div>
+                                            <div><span class="metric-value">{{ "%.1f"|format(model.metrics.specificity*100) }}%</span> Specificity</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr class="my-4">
+
+                    <div class="row">
+                        <div class="col-md-6 form-section">
+                            <h4 class="section-title"><i class="bi bi-person-badge me-2"></i>Personal Information</h4>
+
+                            <!-- Age -->
+                            <div class="form-group">
+                                <label for="age" class="form-label required-field">Age</label>
+                                <div class="input-group">
+                                    <input type="number" class="form-control form-field" id="age" name="age" min="0" max="120" step="1" required>
+                                    <span class="input-group-text">years</span>
+                                    <i class="bi bi-info-circle ms-2 info-tooltip" data-bs-toggle="tooltip" title="{{ feature_info.age }}"></i>
+                                </div>
+                            </div>
+                            
+                            <!-- Gender -->
+                            <div class="form-group">
+                                <label for="gender" class="form-label required-field">Gender</label>
+                                <div class="d-flex align-items-center">
+                                    <select class="form-select form-field" id="gender" name="gender" required>
+                                        <option value="" selected disabled>Select gender</option>
+                                        {% for option, value in gender_options.items() %}
+                                            <option value="{{ value }}">{{ option }}</option>
+                                        {% endfor %}
+                                    </select>
+                                    <i class="bi bi-info-circle ms-2 info-tooltip" data-bs-toggle="tooltip" title="{{ feature_info.gender }}"></i>
+                                </div>
+                            </div>
+                            
+                            <!-- Ever Married -->
+                            <div class="form-group">
+                                <label for="ever_married" class="form-label required-field">Ever Married</label>
+                                <div class="d-flex align-items-center">
+                                    <select class="form-select form-field" id="ever_married" name="ever_married" required>
+                                        <option value="" selected disabled>Select option</option>
+                                        {% for option, value in married_options.items() %}
+                                            <option value="{{ value }}">{{ option }}</option>
+                                        {% endfor %}
+                                    </select>
+                                    <i class="bi bi-info-circle ms-2 info-tooltip" data-bs-toggle="tooltip" title="{{ feature_info.ever_married }}"></i>
+                                </div>
+                            </div>
+                            
+                            <!-- Work Type -->
+                            <div class="form-group">
+                                <label for="work_type" class="form-label required-field">Work Type</label>
+                                <div class="d-flex align-items-center">
+                                    <select class="form-select form-field" id="work_type" name="work_type" required>
+                                        <option value="" selected disabled>Select work type</option>
+                                        {% for option, value in work_options.items() %}
+                                            <option value="{{ value }}">{{ option }}</option>
+                                        {% endfor %}
+                                    </select>
+                                    <i class="bi bi-info-circle ms-2 info-tooltip" data-bs-toggle="tooltip" title="{{ feature_info.work_type }}"></i>
+                                </div>
+                            </div>
+                            
+                            <!-- Residence Type -->
+                            <div class="form-group">
+                                <label for="residence_type" class="form-label required-field">Residence Type</label>
+                                <div class="d-flex align-items-center">
+                                    <select class="form-select form-field" id="residence_type" name="residence_type" required>
+                                        <option value="" selected disabled>Select residence type</option>
+                                        {% for option, value in residence_options.items() %}
+                                            <option value="{{ value }}">{{ option }}</option>
+                                        {% endfor %}
+                                    </select>
+                                    <i class="bi bi-info-circle ms-2 info-tooltip" data-bs-toggle="tooltip" title="{{ feature_info.residence_type }}"></i>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6 form-section">
+                            <h4 class="section-title"><i class="bi bi-heart me-2"></i>Health Information</h4>
+                            
+                            <!-- Average Glucose Level -->
+                            <div class="form-group">
+                                <label for="avg_glucose_level" class="form-label required-field">Average Glucose Level</label>
+                                <div class="input-group">
+                                    <input type="number" class="form-control form-field" id="avg_glucose_level" name="avg_glucose_level" min="50" max="300" step="0.1" required>
+                                    <span class="input-group-text">mg/dL</span>
+                                    <i class="bi bi-info-circle ms-2 info-tooltip" data-bs-toggle="tooltip" title="{{ feature_info.avg_glucose_level }}"></i>
+                                </div>
+                            </div>
+                            
+                            <!-- BMI -->
+                            <div class="form-group">
+                                <label for="bmi" class="form-label required-field">BMI</label>
+                                <div class="input-group">
+                                    <input type="number" class="form-control form-field" id="bmi" name="bmi" min="10" max="60" step="0.1" required>
+                                    <span class="input-group-text">kg/m²</span>
+                                    <i class="bi bi-info-circle ms-2 info-tooltip" data-bs-toggle="tooltip" title="{{ feature_info.bmi }}"></i>
+                                </div>
+                            </div>
+                            
+                            <!-- Hypertension -->
+                            <div class="form-group">
+                                <label class="form-label required-field">Hypertension</label>
+                                <div class="d-flex align-items-center mb-2">
+                                    <div class="form-check form-check-inline radio-card">
+                                        <input class="form-check-input form-field" type="radio" name="hypertension" id="hypertension_no" value="0" required>
+                                        <label class="form-check-label ms-2" for="hypertension_no">No</label>
+                                    </div>
+                                    <div class="form-check form-check-inline radio-card">
+                                        <input class="form-check-input form-field" type="radio" name="hypertension" id="hypertension_yes" value="1">
+                                        <label class="form-check-label ms-2" for="hypertension_yes">Yes</label>
+                                    </div>
+                                    <i class="bi bi-info-circle ms-2 info-tooltip" data-bs-toggle="tooltip" title="{{ feature_info.hypertension }}"></i>
+                                </div>
+                            </div>
+                            
+                            <!-- Heart Disease -->
+                            <div class="form-group">
+                                <label class="form-label required-field">Heart Disease</label>
+                                <div class="d-flex align-items-center mb-2">
+                                    <div class="form-check form-check-inline radio-card">
+                                        <input class="form-check-input form-field" type="radio" name="heart_disease" id="heart_disease_no" value="0" required>
+                                        <label class="form-check-label ms-2" for="heart_disease_no">No</label>
+                                    </div>
+                                    <div class="form-check form-check-inline radio-card">
+                                        <input class="form-check-input form-field" type="radio" name="heart_disease" id="heart_disease_yes" value="1">
+                                        <label class="form-check-label ms-2" for="heart_disease_yes">Yes</label>
+                                    </div>
+                                    <i class="bi bi-info-circle ms-2 info-tooltip" data-bs-toggle="tooltip" title="{{ feature_info.heart_disease }}"></i>
+                                </div>
+                            </div>
+                            
+                            <!-- Smoking Status -->
+                            <div class="form-group">
+                                <label for="smoking_status" class="form-label required-field">Smoking Status</label>
+                                <div class="d-flex align-items-center">
+                                    <select class="form-select form-field" id="smoking_status" name="smoking_status" required>
+                                        <option value="" selected disabled>Select smoking status</option>
+                                        {% for option, value in smoking_options.items() %}
+                                            <option value="{{ value }}">{{ option }}</option>
+                                        {% endfor %}
+                                    </select>
+                                    <i class="bi bi-info-circle ms-2 info-tooltip" data-bs-toggle="tooltip" title="{{ feature_info.smoking_status }}"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <hr class="my-4">
+                    
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="bi bi-search me-2"></i>Predict Stroke Risk
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <div class="card notice-card">
+            <div class="card-body">
+                <div class="d-flex align-items-center mb-3">
+                    <i class="bi bi-info-circle-fill notice-icon me-3"></i>
+                    <h5 class="mb-0 fw-bold">Medical Disclaimer</h5>
+                </div>
+                <p class="mb-0">This tool is for informational purposes only and should not replace professional medical advice, diagnosis, or treatment. The prediction results are based on statistical models and may not apply to every individual. Always consult with a qualified healthcare provider regarding any medical conditions or concerns.</p>
+            </div>
+        </div>
+    </div>
+
+    <footer class="text-white py-4 mt-5">
+        <div class="container text-center">
+            <p class="mb-2">© 2025 Stroke Risk Predictor | Developed for Health Monitoring</p>
+            <div class="mt-2">
+                <a href="/privacy" class="text-white-50 text-decoration-none me-3">Privacy Policy</a>
+                <a href="/terms" class="text-white-50 text-decoration-none me-3">Terms of Use</a>
+                <a href="/contact" class="text-white-50 text-decoration-none">Contact Us</a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Initialize tooltips
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl, {
+                boundary: document.body,
+                placement: 'top'
+            });
+        });
+        
+        // Form progress tracker
+        const formFields = document.querySelectorAll('.form-field');
+        const progressBar = document.getElementById('formProgress');
+        const totalFields = formFields.length;
+        
+        function updateProgress() {
+            let filledFields = 0;
+            
+            formFields.forEach(field => {
+                if (field.type === 'radio') {
+                    // For radio buttons, check if any in the group is selected
+                    const name = field.name;
+                    const radioGroup = document.querySelectorAll(`input[name="${name}"]:checked`);
+                } else {
+                    // For regular inputs
+                    if (field.value.trim() !== '' && !field.disabled) {
+                        filledFields++;
+                    }
+                }
+            });
+            
+            // Calculate unique fields by filtering out duplicates (e.g., radio button groups)
+            const uniqueFieldNames = new Set();
+            formFields.forEach(field => uniqueFieldNames.add(field.name));
+            const uniqueFieldCount = uniqueFieldNames.size;
+            
+            // Update progress bar
+            const progressPercentage = (filledFields / uniqueFieldCount) * 100;
+            progressBar.style.width = `${progressPercentage}%`;
+            
+            // Add visual feedback for progress
+            if (progressPercentage < 33) {
+                progressBar.style.background = 'linear-gradient(90deg, #f43f5e, #fb7185)';
+            } else if (progressPercentage < 66) {
+                progressBar.style.background = 'linear-gradient(90deg, #fb923c, #f97316)';
+            } else if (progressPercentage < 100) {
+                progressBar.style.background = 'linear-gradient(90deg, #4ade80, #22c55e)';
+            } else {
+                progressBar.style.background = 'linear-gradient(90deg, #34d399, #10b981)';
+            }
+        }
+        
+        // Model and clinical context selection
+        const modelCards = document.querySelectorAll('.model-card');
+        const contextRadios = document.querySelectorAll('input[name="context_id"]');
+        const modelRadios = document.querySelectorAll('input[name="model_id"]');
+        const recommendedModelName = document.getElementById('recommendedModelName');
+        const recommendationExplanation = document.getElementById('recommendationExplanation');
+        
+        // Clinical context data (this would typically come from the backend)
+        const clinicalContexts = {
+            'general': {
+                name: 'General Practice',
+                recommended_model: 'knn',
+                explanation: 'KNN has the highest sensitivity (94.7%) and ROC AUC (95.9%), ensuring minimal missed stroke cases while maintaining high specificity.',
+            },
+            'emergency': {
+                name: 'Emergency Department',
+                recommended_model: 'knn',
+                explanation: 'KNN has the highest sensitivity (94.7%), ensuring minimal missed stroke cases. This is crucial in emergency settings where missing a stroke case could be fatal.',
+            },
+            'primary': {
+                name: 'Primary Care',
+                recommended_model: 'rf',
+                explanation: 'Random Forest provides good overall balance (89.8% accuracy, 92.4% sensitivity) with robust performance across diverse patient populations common in primary care.',
+            }
+        };
+        
+        // Model data (this would typically come from the backend)
+        const models = {
+            'knn': {
+                name: 'K-Nearest Neighbors',
+                metrics: {
+                    accuracy: 0.878,
+                    recall: 0.947,
+                    specificity: 0.895,
+                    roc_auc: 0.959
+                }
+            },
+            'rf': {
+                name: 'Random Forest',
+                metrics: {
+                    accuracy: 0.898,
+                    recall: 0.924,
+                    specificity: 0.901,
+                    roc_auc: 0.953
+                }
+            },
+    
+            'logistic': {
+                name: 'Logistic Regression',
+                metrics: {
+                    accuracy: 0.859,
+                    recall: 0.901,
+                    specificity: 0.867,
+                    roc_auc: 0.924
+                }
+            }
+        };
+        
+        function selectContext(contextId) {
+            // Update radio button
+            document.getElementById(`context_${contextId}`).checked = true;
+            
+            // Update model recommendation
+            const context = clinicalContexts[contextId];
+            const recommendedModel = models[context.recommended_model];
+            
+            recommendedModelName.textContent = recommendedModel.name;
+            recommendationExplanation.textContent = context.explanation;
+            
+            // Highlight the recommended model
+            highlightRecommendedModel(context.recommended_model);
+            
+            // Update all model cards
+            modelCards.forEach(card => {
+                card.classList.remove('selected');
+                if (card.querySelector(`input[value="${context.recommended_model}"]`)) {
+                    card.classList.add('selected');
+                }
+            });
+            
+            // Update progress
+            updateProgress();
+        }
+        
+        function selectModel(modelId) {
+            // Update radio button
+            document.getElementById(`model_${modelId}`).checked = true;
+            
+            // Update all model cards
+            modelCards.forEach(card => {
+                card.classList.remove('selected');
+                if (card.querySelector(`input[value="${modelId}"]`)) {
+                    card.classList.add('selected');
+                }
+            });
+            
+            // Update progress
+            updateProgress();
+        }
+        
+        function highlightRecommendedModel(modelId) {
+            // Select the recommended model's radio
+            document.getElementById(`model_${modelId}`).checked = true;
+            
+            // Highlight the card
+            modelCards.forEach(card => {
+                card.classList.remove('selected');
+                if (card.querySelector(`input[value="${modelId}"]`)) {
+                    card.classList.add('selected');
+                }
+            });
+        }
+        
+        // Form validation enhancement
+        const predictionForm = document.getElementById('predictionForm');
+        
+        predictionForm.addEventListener('submit', function(event) {
+            // Check if all required fields are filled
+            const requiredFields = document.querySelectorAll('[required]');
+            let isValid = true;
+            
+            requiredFields.forEach(field => {
+                if (field.type === 'radio') {
+                    // For radio buttons, check if any in the group is selected
+                    const name = field.name;
+                    const radioGroup = document.querySelectorAll(`input[name="${name}"]:checked`);
+                    if (radioGroup.length === 0) {
+                        isValid = false;
+                        highlightFieldError(field.closest('.form-group'));
+                    }
+                } else {
+                    if (!field.value.trim()) {
+                        isValid = false;
+                        highlightFieldError(field);
+                    }
+                }
+            });
+            
+            if (!isValid) {
+                event.preventDefault();
+                showValidationError();
+            }
+        });
+        
+        function highlightFieldError(field) {
+            // Add visual feedback for error
+            field.classList.add('is-invalid');
+            
+            // For groups, highlight the whole group
+            if (field.classList.contains('form-group')) {
+                field.querySelectorAll('input, select').forEach(input => {
+                    input.classList.add('is-invalid');
+                });
+            }
+            
+            // Remove error highlighting when user corrects the field
+            field.addEventListener('input', function() {
+                field.classList.remove('is-invalid');
+                if (field.classList.contains('form-group')) {
+                    field.querySelectorAll('input, select').forEach(input => {
+                        input.classList.remove('is-invalid');
+                    });
+                }
+            });
+            
+            field.addEventListener('change', function() {
+                field.classList.remove('is-invalid');
+                if (field.classList.contains('form-group')) {
+                    field.querySelectorAll('input, select').forEach(input => {
+                        input.classList.remove('is-invalid');
+                    });
+                }
+            });
+        }
+        
+        function showValidationError() {
+            // Create alert message
+            const alertDiv = document.createElement('div');
+            alertDiv.className = 'alert alert-danger alert-dismissible fade show mt-3';
+            alertDiv.role = 'alert';
+            alertDiv.innerHTML = `
+                <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                Please fill in all required fields marked with an asterisk (*).
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            `;
+            
+            // Insert at top of form
+            predictionForm.insertBefore(alertDiv, predictionForm.firstChild);
+            
+            // Scroll to top of form
+            window.scrollTo({
+                top: predictionForm.offsetTop - 100,
+                behavior: 'smooth'
+            });
+            
+            // Auto-dismiss after 5 seconds
+            setTimeout(() => {
+                const bsAlert = new bootstrap.Alert(alertDiv);
+                bsAlert.close();
+            }, 5000);
+        }
+        
+        // Add event listeners for all form fields to track progress
+        formFields.forEach(field => {
+            field.addEventListener('input', updateProgress);
+            field.addEventListener('change', updateProgress);
+        });
+        
+        // Initialize form selections and progress
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set default context and model
+            selectContext('general');
+            
+            // Calculate initial progress
+            updateProgress();
+            
+            // Add form validation styles
+            document.querySelectorAll('.form-control, .form-select').forEach(el => {
+                el.addEventListener('invalid', function() {
+                    this.classList.add('is-invalid');
+                });
+                
+                el.addEventListener('input', function() {
+                    if (this.checkValidity()) {
+                        this.classList.remove('is-invalid');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

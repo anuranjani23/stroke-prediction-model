@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stroke Prediction Results</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <style>
+        .result-card {
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+        .result-card:hover {
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+        }
+        .risk-meter {
+            height: 30px;
+            border-radius: 15px;
+            background: linear-gradient(to right, #28a745, #ffc107, #dc3545);
+            position: relative;
+            margin: 20px 0;
+        }
+        .risk-indicator {
+            width: 20px;
+            height: 20px;
+            background-color: #343a40;
+            border-radius: 50%;
+            position: absolute;
+            top: 5px;
+            transform: translateX(-50%);
+            border: 2px solid white;
+        }
+        .metric-card {
+            border-radius: 8px;
+            transition: transform 0.2s;
+        }
+        .metric-card:hover {
+            transform: translateY(-5px);
+        }
+        .risk-factor-card {
+            border-left: 5px solid;
+            margin-bottom: 10px;
+        }
+        .severity-high {
+            border-left-color: #dc3545;
+        }
+        .severity-moderate {
+            border-left-color: #ffc107;
+        }
+        .severity-low {
+            border-left-color: #28a745;
+        }
+        .severity-very-high {
+            border-left-color: #721c24;
+            background-color: #f8d7da;
+        }
+        .recommendation-section {
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+        .recommendation-urgent {
+            background-color: #f8d7da;
+            border-left: 5px solid #721c24;
+        }
+        .recommendation-specific {
+            background-color: #fff3cd;
+            border-left: 5px solid #856404;
+        }
+        .recommendation-general {
+            background-color: #d1ecf1;
+            border-left: 5px solid #0c5460;
+        }
+        .tooltip-info {
+            cursor: help;
+        }
+        .probability-gauge {
+            width: 200px;
+            height: 200px;
+            margin: 0 auto;
+            position: relative;
+        }
+        .gauge-background {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: #f5f5f5;
+            position: relative;
+            overflow: hidden;
+            box-shadow: inset -2px -2px 6px rgba(0,0,0,0.1);
+        }
+        .gauge-fill {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            background: linear-gradient(to top, #dc3545 0%, #ffc107 50%, #28a745 100%);
+        }
+        .gauge-center {
+            position: absolute;
+            width: 70%;
+            height: 70%;
+            background: white;
+            border-radius: 50%;
+            top: 15%;
+            left: 15%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .probability-value {
+            font-size: 2rem;
+            font-weight: bold;
+        }
+        .model-info-tooltip {
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="container py-5">
+        <h1 class="mb-4 text-center">Stroke Risk Assessment Results</h1>
+        
+        <div class="row mb-5">
+            <!-- Left column with prediction result -->
+            <div class="col-lg-6">
+                <div class="result-card card mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h3 class="card-title mb-0">Prediction Result</h3>
+                    </div>
+                    <div class="card-body text-center">
+                        <div class="probability-gauge mb-4">
+                            <div class="gauge-background">
+                                <!-- Height will be set by JavaScript based on probability -->
+                                <div class="gauge-fill" id="gauge-fill"></div>
+                            </div>
+                            <div class="gauge-center">
+                                <div class="probability-value {{ category_class }}">{{ probability }}%</div>
+                                <div>Stroke Risk</div>
+                            </div>
+                        </div>
+                        
+                        <h4 class="mt-4">Risk Category: <span class="{{ category_class }}">{{ risk_category }}</span></h4>
+                        
+                        <div class="row mt-4">
+                            <div class="col-6">
+                                <div class="card bg-light">
+                                    <div class="card-body text-center">
+                                        <h5>Stroke Risk</h5>
+                                        <h2 class="{{ category_class }}">{{ probability }}%</h2>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="card bg-light">
+                                    <div class="card-body text-center">
+                                        <h5>No Stroke Risk</h5>
+                                        <h2 class="text-success">{{ probability_no_stroke }}%</h2>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="alert {{ 'alert-danger' if prediction == 1 else 'alert-success' }} mt-4">
+                            <h4 class="alert-heading">
+                                {% if prediction == 1 %}
+                                <i class="fas fa-exclamation-triangle mr-2"></i>Elevated Stroke Risk Detected
+                                {% else %}
+                                <i class="fas fa-check-circle mr-2"></i>Low Stroke Risk Detected
+                                {% endif %}
+                            </h4>
+                            <p>
+                                {% if prediction == 1 %}
+                                Our model has detected factors that suggest an elevated risk of stroke. Please consult with healthcare professionals.
+                                {% else %}
+                                Based on the information provided, your stroke risk appears to be relatively low. However, it's still important to maintain a healthy lifestyle.
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Model performance metrics -->
+                <div class="result-card card">
+                    <div class="card-header bg-info text-white">
+                        <h3 class="card-title mb-0">
+                            Model Performance
+                            <span class="model-info-tooltip float-right" data-toggle="tooltip" title="These metrics represent how well our model performs on test data">
+                                <i class="fas fa-info-circle"></i>
+                            </span>
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-6 col-md-3 mb-3">
+                                <div class="metric-card card bg-light h-100">
+                                    <div class="card-body text-center">
+                                        <h6 class="card-title text-muted">Accuracy</h6>
+                                        <h4 class="mb-0">{{ model_metrics.accuracy }}</h4>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-6 col-md-3 mb-3">
+                                <div class="metric-card card bg-light h-100">
+                                    <div class="card-body text-center">
+                                        <h6 class="card-title text-muted">Precision</h6>
+                                        <h4 class="mb-0">{{ model_metrics.precision }}</h4>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-6 col-md-3 mb-3">
+                                <div class="metric-card card bg-light h-100">
+                                    <div class="card-body text-center">
+                                        <h6 class="card-title text-muted">Recall</h6>
+                                        <h4 class="mb-0">{{ model_metrics.recall }}</h4>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-6 col-md-3 mb-3">
+                                <div class="metric-card card bg-light h-100">
+                                    <div class="card-body text-center">
+                                        <h6 class="card-title text-muted">F1 Score</h6>
+                                        <h4 class="mb-0">{{ model_metrics.f1_score }}</h4>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="alert alert-secondary mt-3">
+                            <h5><i class="fas fa-chart-line mr-2"></i>What These Metrics Mean</h5>
+                            <p><strong>Accuracy:</strong> Overall correctness of predictions ({{model_metrics.accuracy}} of predictions are correct).</p>
+                            <p><strong>Precision:</strong> When we predict stroke risk, we're right {{model_metrics.precision}} of the time.</p>
+                            <p><strong>Recall:</strong> Of all actual stroke cases, we identify {{model_metrics.recall}} of them.</p>
+                            <p><strong>F1 Score:</strong> A balanced measure of precision and recall ({{model_metrics.f1_score}}).</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Right column with risk factors and recommendations -->
+            <div class="col-lg-6">
+                <!-- Risk comparison chart -->
+                <div class="result-card card mb-4">
+                    <div class="card-header bg-secondary text-white">
+                        <h3 class="card-title mb-0">Risk Comparison</h3>
+                    </div>
+                    <div class="card-body text-center">
+                        <img src="{{ risk_chart }}" alt="Risk Comparison Chart" class="img-fluid">
+                        <p class="mt-3">This chart shows how your stroke risk compares to the general population average of 5%.</p>
+                    </div>
+                </div>
+            
+                <!-- Risk factors -->
+                <div class="result-card card mb-4">
+                    <div class="card-header bg-warning text-dark">
+                        <h3 class="card-title mb-0">Identified Risk Factors</h3>
+                    </div>
+                    <div class="card-body">
+                        {% if risk_factors %}
+                            {% for factor in risk_factors %}
+                                <div class="risk-factor-card card mb-2 severity-{{ factor.severity }}">
+                                    <div class="card-body">
+                                        <h5 class="card-title">
+                                            {{ factor.factor }}
+                                            {% if factor.severity == 'high' or factor.severity == 'very high' %}
+                                                <i class="fas fa-exclamation-triangle text-danger ml-2"></i>
+                                            {% endif %}
+                                        </h5>
+                                        <p class="card-text">{{ factor.detail }}</p>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        {% else %}
+                            <div class="alert alert-success">
+                                <i class="fas fa-check-circle mr-2"></i>No significant risk factors identified.
+                            </div>
+                        {% endif %}
+                        
+                        <div class="alert alert-info mt-3">
+                            <h5><i class="fas fa-info-circle mr-2"></i>About Risk Factors</h5>
+                            <p>Risk factors are characteristics that increase your likelihood of stroke. 
+                            While some factors like age cannot be changed, many can be managed with proper care.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Recommendations -->
+                <div class="result-card card">
+                    <div class="card-header bg-success text-white">
+                        <h3 class="card-title mb-0">Personalized Recommendations</h3>
+                    </div>
+                    <div class="card-body">
+                        {% if recommendations.urgent %}
+                            <div class="recommendation-section recommendation-urgent">
+                                <h4><i class="fas fa-ambulance mr-2"></i>Urgent Actions</h4>
+                                <ul class="mb-0">
+                                    {% for rec in recommendations.urgent %}
+                                        <li>{{ rec }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        {% endif %}
+                        
+                        {% if recommendations.specific %}
+                            <div class="recommendation-section recommendation-specific">
+                                <h4><i class="fas fa-clipboard-list mr-2"></i>Specific Recommendations</h4>
+                                <ul class="mb-0">
+                                    {% for rec in recommendations.specific %}
+                                        <li>{{ rec }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        {% endif %}
+                        
+                        <div class="recommendation-section recommendation-general">
+                            <h4><i class="fas fa-heart mr-2"></i>General Health Recommendations</h4>
+                            <ul class="mb-0">
+                                {% for rec in recommendations.general %}
+                                    <li>{{ rec }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                        
+                        <div class="alert alert-warning mt-3">
+                            <h5><i class="fas fa-exclamation-triangle mr-2"></i>Important Note</h5>
+                            <p>These recommendations are based on a predictive model and should not replace professional medical advice. 
+                            Please consult with healthcare professionals for personalized guidance.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="text-center mb-4">
+            <a href="/" class="btn btn-primary mr-2">New Prediction</a>
+            <a href="/history" class="btn btn-secondary mr-2">View History</a>
+            <a href="/about" class="btn btn-info">About This Tool</a>
+        </div>
+    </div>
+    
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            // Initialize tooltips
+            $('[data-toggle="tooltip"]').tooltip();
+            
+            // Set gauge fill height based on probability
+            const probability = ({ probability });
+            const gaugeHeight = 100 - probability;
+            $('#gauge-fill').css('height', probability + '%');
+            
+            // Highlight values based on risk level
+            if (probability >= 75) {
+                $('.probability-value').addClass('text-danger');
+            } else if (probability >= 50) {
+                $('.probability-value').addClass('text-warning');
+            } else if (probability >= 25) {
+                $('.probability-value').addClass('text-info');
+            } else {
+                $('.probability-value').addClass('text-success');
+            }
+        });
+    </script>
+</body>
+</html>

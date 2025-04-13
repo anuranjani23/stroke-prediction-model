@@ -1,0 +1,150 @@
+[
+  {
+    "timestamp": "2025-04-10 14:43:39",
+    "features": {
+      "age": 1,
+      "avg_glucose_level": 67.0,
+      "bmi": 0,
+      "hypertension": "Yes",
+      "heart_disease": "Yes",
+      "gender": "Other",
+      "ever_married": "Yes",
+      "work_type": "Unknown",
+      "residence_type": "Unknown",
+      "smoking_status": "formerly smoked"
+    },
+    "prediction": 1,
+    "probability": 1.0,
+    "risk": "High"
+  },
+  {
+    "timestamp": "2025-04-10 15:16:28",
+    "features": {
+      "age": 0,
+      "avg_glucose_level": 22.0,
+      "bmi": 0,
+      "hypertension": "No",
+      "heart_disease": "No",
+      "gender": "Other",
+      "ever_married": "Yes",
+      "work_type": "Unknown",
+      "residence_type": "Unknown",
+      "smoking_status": "never smoked"
+    },
+    "prediction": 0,
+    "probability": 0.0,
+    "risk": "Low"
+  },
+  {
+    "timestamp": "2025-04-10 15:22:00",
+    "features": {
+      "age": 1,
+      "avg_glucose_level": 55.0,
+      "bmi": 0,
+      "hypertension": "No",
+      "heart_disease": "Yes",
+      "gender": "Female",
+      "ever_married": "No",
+      "work_type": "Unknown",
+      "residence_type": "Unknown",
+      "smoking_status": "formerly smoked"
+    },
+    "prediction": 1,
+    "probability": 1.0,
+    "risk": "High"
+  },
+  {
+    "timestamp": "2025-04-12 03:21:28",
+    "features": {
+      "age": 55.0,
+      "avg_glucose_level": 191.6,
+      "bmi": 28.4,
+      "hypertension": "Yes",
+      "heart_disease": "No",
+      "gender": "Male",
+      "ever_married": "Yes",
+      "work_type": "Self-employed",
+      "residence_type": "Urban",
+      "smoking_status": "smokes"
+    },
+    "prediction": 1,
+    "probability": 0.636,
+    "risk_category": "High"
+  },
+  {
+    "timestamp": "2025-04-12 03:22:04",
+    "features": {
+      "age": 55.0,
+      "avg_glucose_level": 190.5,
+      "bmi": 28.0,
+      "hypertension": "Yes",
+      "heart_disease": "No",
+      "gender": "Male",
+      "ever_married": "Yes",
+      "work_type": "Self-employed",
+      "residence_type": "Urban",
+      "smoking_status": "smokes"
+    },
+    "prediction": 1,
+    "probability": 0.636,
+    "risk_category": "High"
+  },
+  {
+    "timestamp": "2025-04-12 03:24:06",
+    "features": {
+      "age": 55.0,
+      "avg_glucose_level": 191.0,
+      "bmi": 29.6,
+      "hypertension": "No",
+      "heart_disease": "No",
+      "gender": "Male",
+      "ever_married": "Yes",
+      "work_type": "Govt_job",
+      "residence_type": "Urban",
+      "smoking_status": "smokes"
+    },
+    "prediction": 0,
+    "probability": 0.273,
+    "risk_category": "Low"
+  },
+  {
+    "timestamp": "2025-04-12 23:47:29",
+    "features": {
+      "age": 55.0,
+      "avg_glucose_level": 190.2,
+      "bmi": 36.6,
+      "hypertension": "No",
+      "heart_disease": "Yes",
+      "gender": "Male",
+      "ever_married": "Yes",
+      "work_type": "Govt_job",
+      "residence_type": "Urban",
+      "smoking_status": "formerly smoked"
+    },
+    "prediction": 0,
+    "probability": 0.182,
+    "risk_category": "Very Low",
+    "model_used": "K-Nearest Neighbors",
+    "clinical_context": "General Hospital Screening"
+  },
+  {
+    "timestamp": "2025-04-12 23:54:59",
+    "features": {
+      "age": 55.0,
+      "avg_glucose_level": 191.3,
+      "bmi": 36.6,
+      "hypertension": "Yes",
+      "heart_disease": "Yes",
+      "gender": "Male",
+      "ever_married": "Yes",
+      "work_type": "Private",
+      "residence_type": "Urban",
+      "smoking_status": "Unknown"
+    },
+    "prediction": 1,
+    "probability": 0.909,
+    "risk_category": "Very High",
+    "model_used": "K-Nearest Neighbors",
+    "clinical_context": "Emergency Screening"
+  }
+]
