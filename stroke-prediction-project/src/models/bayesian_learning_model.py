@@ -1,100 +1,125 @@
 import pandas as pd
 import os
-# For saving and loading the trained models:
-import joblib
+import pickle
 import logging
-
-# For the cross-validation and hyperparameter tuning of the model:
-from sklearn.model_selection import StratifiedKFold, GridSearchCV
+import numpy as np
+from sklearn.model_selection import StratifiedKFold, RandomizedSearchCV, train_test_split
 from sklearn.naive_bayes import GaussianNB
-# For the data scaling and encoding of the categorical features in dataset:
-from sklearn.preprocessing import OneHotEncoder
-# For preprocessing the pipeline for different data types:
+from sklearn.preprocessing import StandardScaler, OneHotEncoder, PowerTransformer, RobustScaler
+from imblearn.pipeline import Pipeline
 from sklearn.compose import ColumnTransformer
-# Using the Synthetic Minority Over-sampling Technique (SMOTE) to handle the class imbalance:
-from imblearn.over_sampling import SMOTE
-from imblearn.pipeline import Pipeline as ImbPipeline  # Pipeline that supports imbalanced learning methods
-from sklearn.feature_selection import SelectKBest, mutual_info_classif
+from sklearn.feature_selection import mutual_info_classif, SelectPercentile, f_classif
+from sklearn.metrics import recall_score, confusion_matrix, make_scorer
 
+def recall_specificity_score(y_true, y_pred):
+    recall = recall_score(y_true, y_pred)
+    tn, fp, fn, tp = confusion_matrix(y_true, y_pred).ravel()
+    specificity = tn / (tn + fp) if (tn + fp) > 0 else 0
+    # Weighted custom score
+    return 0.99999999 * recall + 0.000000001 * specificity
 # Setting up the logging to display important information during execution:
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s: %(message)s')
 logger = logging.getLogger(__name__)
 
+# Define the paths
 BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
-DATA_PATH = os.path.join(BASE_DIR, 'data', 'processed', 'cleaned_dataset.csv')
+X_TRAIN_PATH = os.path.join(BASE_DIR, 'data', 'processed', 'X_train_resampled.csv')
+Y_TRAIN_PATH = os.path.join(BASE_DIR, 'data', 'processed', 'y_train_resampled.csv')
 MODELS_DIR = os.path.join(BASE_DIR, 'src', 'models')
 MODEL_PATH = os.path.join(MODELS_DIR, 'bayesian_model.pkl')
 
-
-# Loading the dataset and preparing the feature set (X) and target variable (y):
+# Loading the oversampled dataset and preparing the feature set (X) and target variable (y):
 def load_and_prepare_data():
-    df = pd.read_csv(DATA_PATH)
-    X = df.drop(columns=['stroke'])  # Features (all the columns except 'stroke').
-    y = df['stroke']  # Target variable (stroke prediction).
+    X = pd.read_csv(X_TRAIN_PATH)
+    y = pd.read_csv(Y_TRAIN_PATH)
+    y = y.values.ravel()
+    logger.info(f"Loaded {X.shape[0]} samples with {X.shape[1]} features")
+    logger.info(f"Target variable shape: {y.shape}")
     return X, y
 
 
-# Function for Hyperparameter Tuning using GridSearchCV:
+# Function for Hyperparameter Tuning using RandomizedSearchCV:
 def perform_hyperparameter_tuning(X, y):
-    # Identifying the column types for preprocessing:
+    """Builds pipeline, performs randomized search with stratified CV, and returns best estimator."""
+    
+    # Identify numeric and categorical features
     numeric_features = X.select_dtypes(include=['int64', 'float64']).columns
     categorical_features = X.select_dtypes(include=['object', 'category']).columns
-
-    # Applying different preprocessing techniques (Scaling and One-hot encoding respectively) to the numeric and categorical features:
-    preprocessor = ColumnTransformer(
-        transformers=[
-            ('num', 'passthrough', numeric_features),
-            ('cat', OneHotEncoder(handle_unknown='ignore'), categorical_features)
-        ])
-
-    # Using ImbPipeline to incorporate SMOTE for handling class imbalance:
-    pipeline = ImbPipeline([
-        ('preprocessor', preprocessor),
-        ('smote', SMOTE(sampling_strategy=0.6, random_state=42)),  # SMOTE to oversample the minority class (stroke) during training
-        ('feature_selection', SelectKBest(mutual_info_classif)),
-        ('gnb', GaussianNB())
+    
+    # Custom transformer for numeric data that tries different scalers
+    numeric_transformer = Pipeline([
+        ('scaler', PowerTransformer(method='yeo-johnson'))  # Better for Gaussian NB as it makes data more normal
     ])
-
-    # Grid definition for Gaussian Naive Bayes:
-    param_grid = {
-        'feature_selection__k': [5, 6, 7, 8, 10],  # Removed 'all' as it's invalid for SelectKBest; specifies number of features
-        'gnb__var_smoothing': [1e-9, 1e-8, 1e-7, 1e-6, 1e-5]  # Smoothing parameter for handling zero variance
+    
+    categorical_transformer = Pipeline([
+        ('onehot', OneHotEncoder(handle_unknown='ignore', sparse_output=False))
+    ])
+    
+    preprocessor = ColumnTransformer([
+        ('num', numeric_transformer, numeric_features),
+        ('cat', categorical_transformer, categorical_features)
+    ])
+    
+    # Create pipeline with preprocessing, feature selection, and model
+    pipeline = Pipeline([
+        ('preprocessor', preprocessor),
+        ('feature_selection', SelectPercentile(score_func=mutual_info_classif)),
+        ('gnb', GaussianNB(priors=None))  # Let the model learn class priors from data
+    ])
+    
+    # Expanded parameter grid
+    param_dist = {
+        'feature_selection__percentile': [70, 75, 80, 85, 90, 95],  # Higher percentile keeps more features
+        'feature_selection__score_func': [mutual_info_classif, f_classif],  # Try different scoring functions
+        'gnb__var_smoothing': [1e-12, 1e-11, 1e-10], # More extensive smoothing values
+        'preprocessor__num__scaler': [StandardScaler(), PowerTransformer(method='yeo-johnson'), RobustScaler()]
     }
-
-    # 5-fold stratified cross-validation:
-    cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
-    grid_search = GridSearchCV(
-        pipeline, param_grid, cv=cv, scoring='f1', n_jobs=-1  # Using the ROC AUC as an evaluation metric.
+    
+    # Define cross-validation strategy
+    cv = StratifiedKFold(n_splits=6, shuffle=True, random_state=42)
+    custom_score = make_scorer(recall_specificity_score)  # Custom scoring function to balance recall and specificity
+    # Perform randomized search
+    search = RandomizedSearchCV(
+        pipeline,
+        param_distributions=param_dist,
+        n_iter=100,  # More iterations for better exploration
+        cv=cv,
+        scoring=custom_score,
+        refit=True,  # Refit based on recall
+        verbose=2,
+        n_jobs=-1,
+        random_state=42,
+        return_train_score=True
     )
-    # Fit the model using grid search:
-    grid_search.fit(X, y)
+    search.fit(X, y)
+    
+    logger.info(f"Best Parameters: {search.best_params_}")
+    logger.info(f"Best Score: {search.best_score_:.4f}")
+    
+    # Log top 3 models for comparison - FIX: use 'mean_test_recall' since we're refitting based on recall
+    results = pd.DataFrame(search.cv_results_)
+    # Sort by mean_test_recall which is available (instead of rank_test_score which doesn't exist)
+    top_results = results.sort_values('mean_test_score', ascending=False).head(3)
+    for i, (params, score) in enumerate(zip(top_results['params'], top_results['mean_test_score'])):
+        logger.info(f"Rank {i+1} - Score: {score:.4f} - Params: {params}")
+    
+    return search.best_estimator_
 
-    # Logging the best parameters and the performance:
-    logger.info(f"Best Parameters: {grid_search.best_params_}")
-    logger.info(f"Best f1 Score: {grid_search.best_score_:.4f}")
-    return grid_search.best_estimator_
-
-
+# Function for training and saving the model:
 def train_and_save_model():
+    """Trains the model using randomized search and saves the best estimator."""
     os.makedirs(MODELS_DIR, exist_ok=True)
+    
+    logger.info("Loading and preparing data...")
     X, y = load_and_prepare_data()
+    
+    logger.info("Starting hyperparameter tuning...")
     best_model = perform_hyperparameter_tuning(X, y)
-    joblib.dump(best_model, MODEL_PATH)
-    logger.info(f"Bayesian model saved to {MODEL_PATH}")
-
+    
+    # Save the model
+    with open(MODEL_PATH, 'wb') as f:
+        pickle.dump(best_model, f)
+    logger.info(f"Optimized Bayesian model saved to {MODEL_PATH}")
 
 if __name__ == "__main__":
     train_and_save_model()
-
-
-# Gaussian Naive Bayes (GNB) is a probabilistic classifier based on Bayes' theorem with strong (naive) independence assumptions
-# between the features. It assumes that all features are normally distributed, which is where the "Gaussian" part comes from.
-
-# var_smoothing is a stability parameter for GNB that adds a small amount of variance to all features to prevent division by zero,
-# especially when a feature has zero variance. This can improve model performance by handling rare events more gracefully.
-
-# Unlike KNN, Gaussian Naive Bayes is a parametric model that makes assumptions about the underlying data distribution.
-# It works well with small datasets and is computationally efficient, making it suitable for real-time predictions.
-
-# The model computes the probability of each class and the conditional probability of each feature given each class.
-# Classification is done by selecting the class with the highest posterior probability.
