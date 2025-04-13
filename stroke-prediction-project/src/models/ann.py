@@ -3,7 +3,6 @@ import os
 import pickle
 import logging
 import time
-import numpy as np
 
 # For cross-validation and hyperparameter tuning:
 from sklearn.model_selection import StratifiedKFold, RandomizedSearchCV
@@ -14,9 +13,6 @@ from sklearn.preprocessing import StandardScaler, OneHotEncoder
 from sklearn.compose import ColumnTransformer
 
 from imblearn.pipeline import Pipeline
-
-# For handling class imbalance:
-from imblearn.over_sampling import SMOTE
 
 from sklearn.feature_selection import SelectKBest, f_classif
 
