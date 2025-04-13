@@ -20,39 +20,35 @@ from imblearn.over_sampling import SMOTE
 
 from sklearn.feature_selection import SelectKBest, f_classif
 
-# Setting up logging
+
+# Setting up the logging to display important information during execution:
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s: %(message)s')
 logger = logging.getLogger(__name__)
 
+# Define the paths
 BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
-DATA_PATH = os.path.join(BASE_DIR, 'data', 'processed', 'cleaned_dataset.csv')
-MODELS_DIR = os.path.join(BASE_DIR, 'src', 'models')
-ANN_MODEL_PATH = os.path.join(MODELS_DIR, 'ann_model.pkl')
+X_TRAIN_PATH = os.path.join(BASE_DIR, 'data', 'processed', 'X_train_resampled.csv')
+Y_TRAIN_PATH = os.path.join(BASE_DIR, 'data', 'processed', 'y_train_resampled.csv')
+MODELS_DIR = os.path.join(BASE_DIR, 'src', 'models') 
+MODEL_PATH = os.path.join(MODELS_DIR, 'ann_model.pkl')  
+
 
 # Cache to store preprocessed data
 _cached_data = None
-
-# Function for loading and preparing data with optional caching for multiple runs:
-def load_and_prepare_data(use_cache=True):
+def load_and_prepare_data(use_cache=False):
     global _cached_data
-    
-    # Return cached data if available:
     if use_cache and _cached_data is not None:
-        logger.info("Using cached data")
+        logger.info("Using cached data.")
         return _cached_data
-    
-    start_time = time.time()
-    logger.info("Loading dataset...")
-    
-    df = pd.read_csv(DATA_PATH)
-    X = df.drop(columns=['stroke'])
-    y = df['stroke']
-    
-    logger.info(f"Data loaded in {time.time() - start_time:.2f} seconds")
-    
-    if use_cache:
-        _cached_data = (X, y)
-    
+
+    X = pd.read_csv(X_TRAIN_PATH)
+    y = pd.read_csv(Y_TRAIN_PATH)
+    y = y.values.ravel()
+    logger.info(f"Loaded {X.shape[0]} samples with {X.shape[1]} features")
+    logger.info(f"Target variable shape: {y.shape}")
+
+    # Cache the data
+    _cached_data = (X, y)
     return X, y
 
 # Creating column transformer for preprocessing:
@@ -76,7 +72,6 @@ def train_ann(X, y):
     pipeline = Pipeline([
         ('preprocessor', preprocessor),
         ('feature_selection', SelectKBest(f_classif)),
-        ('smote', SMOTE(random_state=42)),
         ('ann', MLPClassifier(random_state=42, max_iter=2000, early_stopping=True))
     ])
     
@@ -86,7 +81,7 @@ def train_ann(X, y):
         'ann__hidden_layer_sizes': [(100,), (256,), (100, 50), (64, 64)],
         'ann__activation': ['relu', 'tanh'],
         'ann__alpha': [0.00001, 0.0001, 0.001, 0.01, 0.1],
-        'ann__learning_rate': [0.00001, 0.0001, 0.001, 'adaptive']
+        'ann__learning_rate': ['adaptive', 'constant', 'invscaling']
     }
     
     # Use RandomizedSearchCV instead of GridSearchCV for faster training:
@@ -94,7 +89,8 @@ def train_ann(X, y):
     search = RandomizedSearchCV(
         pipeline, param_distributions=param_dist, 
         n_iter=40,  
-        cv=cv, scoring='f1', 
+        cv=cv, scoring=['recall', 'roc_auc', 'f1'],
+        refit='f1',
         n_jobs=-1,  
         verbose=1
     )
@@ -102,11 +98,23 @@ def train_ann(X, y):
     logger.info("Training ANN model with RandomizedSearchCV...")
     search.fit(X, y)
     
-    # Log results
-    logger.info(f"ANN - Best Parameters: {search.best_params_}")
-    logger.info(f"ANN - Best F1 Score: {search.best_score_:.4f}")
-    logger.info(f"Training completed in {time.time() - start_time:.2f} seconds")
     
+    # Calculate and log training time
+    training_time = time.time() - start_time
+    logger.info(f"Model training completed in {training_time:.2f} seconds")
+    
+    # Now retrain on full dataset with best parameters
+    logger.info("Retraining best model on full dataset...")
+    
+    logger.info(f"Best Parameters: {search.best_params_}")
+    logger.info(f"Best Score: {search.best_score_:.4f}")
+    
+    # Log top 3 models by ROC AUC
+    results = pd.DataFrame(search.cv_results_)
+    # Log top 3 models by Average Precision
+    top_ap = results.sort_values('rank_test_f1').head(3)
+    for i, (params, score) in enumerate(zip(top_ap['params'], top_ap['mean_test_f1'])):
+        logger.info(f"[f1] Rank {i+1} - Score: {score:.4f} - Params: {params}")
     # Return the best pipeline already trained on full data
     return search.best_estimator_
 
@@ -118,9 +126,9 @@ def train_and_save_model():
     
     # Train and save ANN model
     best_ann_model = train_ann(X, y)
-    with open(f"{ANN_MODEL_PATH}", 'wb') as f:
+    with open(f"{MODEL_PATH}", 'wb') as f:
         pickle.dump(best_ann_model, f)
-    logger.info(f"ANN model saved to {ANN_MODEL_PATH}")
+    logger.info(f"ANN model saved to {MODEL_PATH}")
     logger.info(f"Total execution time: {time.time() - start_time:.2f} seconds")
 
 if __name__ == "__main__":
