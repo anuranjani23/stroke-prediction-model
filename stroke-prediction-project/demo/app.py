@@ -25,69 +25,115 @@ app.secret_key = os.urandom(24)  # For flash messages
 # Configuration
 MODEL_DIR = os.path.join(os.path.dirname(__file__), 'models')
 MODELS = {
-    'knn': {
-        'path': os.path.join(MODEL_DIR, 'knn_model.pkl'),
-        'name': 'K-Nearest Neighbors',
-        'metrics': {
-            'accuracy': 0.833,
-            'precision': 0.64,  # Calculated based on high sensitivity but class imbalance
-            'recall': 0.947,    # Sensitivity
-            'specificity': 0.76,
-            'f1_score': 0.76,
-            'auc': 0.959,
-        },
-        'best_for': 'High-risk screening where catching all potential stroke cases is critical',
-        'strengths': 'Highest sensitivity/recall and ROC AUC, indicating excellent ability to identify true stroke cases',
-        'limitations': 'Lower precision means more false positives'
-    },
     'logistic': {
-        'path': os.path.join(MODEL_DIR, 'logistic_model.pkl'),
+        'path': os.path.join(MODEL_DIR, 'logistic_regression_model.pkl'),
         'name': 'Logistic Regression',
         'metrics': {
-            'accuracy': 0.73,
-            'precision': 0.53,
-            'recall': 0.827,    # Sensitivity
-            'specificity': 0.728,
-            'f1_score': 0.65,
-            'auc': 0.84,
+            'accuracy': 0.8584,
+            'precision': 0.194,
+            'recall': 0.600,    # Sensitivity
+            'specificity': 0.8717,
+            'f1_score': 0.294,  # Calculated based on precision and recall
+            'auc': 0.8332,
         },
-        'best_for': 'Clinical settings requiring good balance between sensitivity and interpretability',
-        'strengths': 'Good sensitivity while maintaining interpretable results',
-        'limitations': 'Lower overall accuracy compared to some models'
+        'best_for': 'General hospital screening, limited resource settings, balanced clinical decision support',
+        'strengths': 'Best overall performer (3/4 scenarios), good balance between sensitivity and specificity, highly interpretable',
+        'limitations': 'Lower sensitivity than Gaussian Naive Bayes'
     },
     'random_forest': {
         'path': os.path.join(MODEL_DIR, 'rf_model.pkl'),
         'name': 'Random Forest',
         'metrics': {
-            'accuracy': 0.755,
-            'precision': 0.58,
-            'recall': 0.74,     # Sensitivity
-            'specificity': 0.756,
-            'f1_score': 0.65,
-            'auc': 0.85,
+            'accuracy': 0.832,
+            'precision': 0.18,
+            'recall': 0.57,     # Sensitivity
+            'specificity': 0.85,
+            'f1_score': 0.273,
+            'auc': 0.81,
         },
-        'best_for': 'Balanced approach when both prediction accuracy and false positive reduction are important',
-        'strengths': 'Good overall performance with strong specificity',
-        'limitations': 'Slightly lower sensitivity than KNN and Logistic Regression'
+        'best_for': 'Consistent second-best performer in most scenarios',
+        'strengths': 'Good overall performance with strong specificity and feature importance insights',
+        'limitations': 'Slightly lower sensitivity than logistic regression and Bayesian models'
     },
     'ann': {
         'path': os.path.join(MODEL_DIR, 'ann_model.pkl'),
         'name': 'Artificial Neural Network',
         'metrics': {
-            'accuracy': 0.74,
-            'precision': 0.56,
-            'recall': 0.81,     # Sensitivity
-            'specificity': 0.73,
-            'f1_score': 0.66,
-            'auc': 0.84,
+            'accuracy': 0.81,
+            'precision': 0.17,
+            'recall': 0.55,     # Sensitivity
+            'specificity': 0.83,
+            'f1_score': 0.26,
+            'auc': 0.78,
         },
-        'best_for': 'Personalized risk assessment with good overall performance',
-        'strengths': 'Good sensitivity with reasonable specificity',
-        'limitations': 'Less interpretable than simpler models'
+        'best_for': 'Limited resource settings with need for good specificity',
+        'strengths': 'Strong performance in limited resource settings, good generalization',
+        'limitations': 'Less interpretable than simpler models, requires more computational resources'
+    },
+    'svm': {
+        'path': os.path.join(MODEL_DIR, 'svm_model.pkl'),
+        'name': 'Support Vector Machine',
+        'metrics': {
+            'accuracy': 0.80,
+            'precision': 0.15,
+            'recall': 0.48,     # Sensitivity
+            'specificity': 0.82,
+            'f1_score': 0.23,
+            'auc': 0.76,
+        },
+        'best_for': 'Settings where good generalization is needed',
+        'strengths': 'Good generalization and specificity',
+        'limitations': 'Lower recall, computationally intensive'
+    },
+    'knn': {
+        'path': os.path.join(MODEL_DIR, 'knn_model.pkl'),
+        'name': 'K-Nearest Neighbors',
+        'metrics': {
+            'accuracy': 0.79,
+            'precision': 0.14,
+            'recall': 0.50,    # Sensitivity
+            'specificity': 0.80,
+            'f1_score': 0.22,
+            'auc': 0.74,
+        },
+        'best_for': 'Moderate performance across scenarios',
+        'strengths': 'Simple and intuitive algorithm with moderate performance',
+        'limitations': 'Lower performance compared to more complex models'
+    },
+    'decision_tree': {
+        'path': os.path.join(MODEL_DIR, 'decision_tree_model.pkl'),
+        'name': 'Decision Tree',
+        'metrics': {
+            'accuracy': 0.78,
+            'precision': 0.16,
+            'recall': 0.62,    # Sensitivity
+            'specificity': 0.79,
+            'f1_score': 0.25,
+            'auc': 0.72,
+        },
+        'best_for': 'High-risk screening scenarios',
+        'strengths': 'Second-best for high-risk screening, highly interpretable',
+        'limitations': 'Lower performance in balanced and limited resource scenarios'
+    },
+    'bayesian': {
+        'path': os.path.join(MODEL_DIR, 'bayesian_model.pkl'),
+        'name': 'Gaussian Naive Bayes',
+        'metrics': {
+            'accuracy': 0.77,
+            'precision': 0.17,
+            'recall': 0.80,    # Sensitivity - highest
+            'specificity': 0.76,
+            'f1_score': 0.28,
+            'auc': 0.78,
+            'npv': 0.9833,     # Negative Predictive Value
+        },
+        'best_for': 'Emergency screening and high-risk patient scenarios where maximum sensitivity is required',
+        'strengths': 'Highest sensitivity (0.80) and NPV (0.9833), ideal for high-risk screening',
+        'limitations': 'Lower specificity can lead to more false positives'
     }
 }
 
-DEFAULT_MODEL = 'knn'  # Set KNN as default based on analysis
+DEFAULT_MODEL = 'logistic'  # Set Logistic Regression as default based on analysis
 HISTORY_FILE = os.path.join(os.path.dirname(__file__), 'data', 'prediction_history.json')
 
 # Ensure directories exist
@@ -98,10 +144,6 @@ os.makedirs(os.path.dirname(HISTORY_FILE), exist_ok=True)
 models = {}
 for model_id, model_info in MODELS.items():
     model_path = model_info['path']
-    # For demonstration, fall back to single model if specific models don't exist
-    if not os.path.exists(model_path) and os.path.exists(os.path.join(os.path.dirname(__file__), 'model', 'stroke_model.pkl')):
-        model_path = os.path.join(os.path.dirname(__file__), 'model', 'stroke_model.pkl')
-        logger.warning(f"Model {model_id} not found. Using default model.")
     
     try:
         if os.path.exists(model_path):
@@ -114,42 +156,71 @@ for model_id, model_info in MODELS.items():
         logger.error(f"Error loading model {model_id}: {e}")
         models[model_id] = None
 
-# Clinical contexts with recommended models
+# Clinical contexts with recommended models - Updated based on new analysis
 CLINICAL_CONTEXTS = {
     'emergency': {
         'name': 'Emergency Screening',
         'description': 'High sensitivity required to ensure minimal missed stroke cases',
-        'recommended_model': 'knn',
-        'explanation': 'KNN has the highest sensitivity (94.7%) and ROC AUC (95.9%), ensuring minimal missed stroke cases. This is crucial in emergency settings where missing a stroke case could be fatal.'
+        'recommended_model': 'bayesian',
+        'explanation': 'Gaussian Naive Bayes has the highest sensitivity (80%) and NPV (98.33%), ensuring minimal missed stroke cases. This is crucial in emergency settings where missing a stroke case could be fatal.'
     },
     'general': {
         'name': 'General Hospital Screening',
         'description': 'Balanced approach for routine clinical screening',
-        'recommended_model': 'knn',
-        'explanation': 'KNN offers the highest overall accuracy (83.3%) while maintaining excellent sensitivity.'
+        'recommended_model': 'logistic',
+        'explanation': 'Logistic Regression offers the best overall performance with balanced sensitivity (60%) and specificity (87.17%), making it ideal for general screening scenarios.'
     },
     'limited': {
         'name': 'Limited Resource Setting',
         'description': 'Optimized for settings with limited follow-up capacity',
-        'recommended_model': 'random_forest',
-        'explanation': 'Random Forest offers the best balance of metrics with good specificity (75.6%), helping reduce unnecessary referrals when resources are constrained.'
+        'recommended_model': 'logistic',
+        'explanation': 'Logistic Regression provides efficient performance with good specificity, helping reduce unnecessary referrals when resources are constrained.'
     },
-    'personalized': {
-        'name': 'Personalized Risk Assessment',
-        'description': 'Detailed risk assessment for individual patient counseling',
-        'recommended_model': 'ann',
-        'explanation': 'ANN provides good sensitivity (81%) with reasonable specificity (73%), well-suited for integration into personalized health monitoring systems.'
+    'balanced': {
+        'name': 'Balanced Clinical Decision Support',
+        'description': 'Optimized for balanced clinical decision making',
+        'recommended_model': 'logistic',
+        'explanation': 'Logistic Regression offers the best performance for balanced clinical decision support with good ROC AUC (83.32%) and interpretability.'
     }
 }
 
-# Feature engineering function
+# Define risk weights for each factor
+# Define risk weights for each factor with more descriptive format
+RISK_WEIGHTS = {
+    "Advanced age": 5.5,  # Over 65 years (severity: high if >75)
+    "High blood glucose": 4,  # High glucose (severity: high if >200 mg/dL)
+    "Obesity": 4,  # BMI over 30 (severity: high if >35)
+    "Hypertension": 3.5,  # Presence of hypertension
+    "Heart disease": 3.5,  # Presence of heart disease
+    "Smoking": 4,  # Currently smoking
+    "Former smoker": 2,  # Former smoker
+    "Hypertension + Heart disease": 6,  # Combined hypertension and heart disease
+}
+
+# Function to compute the risk score from risk factors
+def compute_risk_score(risk_factors):
+    score = 0
+    # Ensure we only process valid factors that exist in RISK_WEIGHTS
+    for factor in risk_factors:
+        if factor["factor"] in RISK_WEIGHTS:
+            score += RISK_WEIGHTS[factor["factor"]]
+        else:
+            print(f"Warning: '{factor['factor']}' is not a valid risk factor.")
+    return score
+
+# Update the feature engineering function to match your preprocessing pipeline
 def perform_feature_engineering(df):
+    # Create new features
     df['age_group'] = pd.cut(df['age'], bins=[0, 30, 45, 60, 100], labels=['Young', 'Middle-Aged', 'Senior', 'Elderly'])
     df['bmi_category'] = pd.cut(df['bmi'], bins=[0, 18.5, 25, 30, 100], labels=['Underweight', 'Normal', 'Overweight', 'Obese'])
     df['glucose_category'] = pd.cut(df['avg_glucose_level'], bins=[0, 70, 100, 125, 200, 1000], labels=['Low', 'Normal', 'Prediabetes', 'Diabetes', 'High Risk'])
     df['age_bmi_interaction'] = df['age'] * df['bmi']
     df['hypertension_heart_disease'] = df['hypertension'] * df['heart_disease']
-    return df
+    
+    # Create dummy variables for categorical features
+    df_encoded = pd.get_dummies(df, columns=['age_group', 'bmi_category', 'glucose_category'], drop_first=False)
+    
+    return df_encoded
 
 # Feature descriptions
 FEATURE_INFO = {
@@ -186,9 +257,9 @@ REVERSE_SMOKING = {v: k for k, v in SMOKING_OPTIONS.items()}
 # Risk categories based on probability
 def get_risk_category(probability):
     if probability < 20:
-        return "Very Low", "text-success"
+        return "Low", "text-success"
     elif probability < 40:
-        return "Low", "text-info"
+        return "Mild", "text-info"
     elif probability < 60:
         return "Moderate", "text-warning"
     elif probability < 80:
@@ -275,7 +346,7 @@ def get_risk_factors(features):
     
     return risk_factors
 
-def create_risk_comparison_chart(user_risk, population_avg=POPULATION_AVERAGES['stroke_risk']):
+"""def create_risk_comparison_chart(user_risk, population_avg=POPULATION_AVERAGES['stroke_risk']):
     plt.figure(figsize=(8, 4))
     labels = ['Your Risk', 'Population Average']
     values = [user_risk, population_avg]
@@ -335,7 +406,7 @@ def create_model_comparison_chart(user_risk, model_metrics):
     # Encode the bytes to base64
     encoded = base64.b64encode(image_png).decode('utf-8')
     return f"data:image/png;base64,{encoded}"
-
+"""
 def generate_personalized_recommendations(risk_factors, probability):
     general_recs = [
         "Schedule regular check-ups with your healthcare provider",
@@ -400,15 +471,8 @@ def predict():
         model_id = request.form.get('model_id', DEFAULT_MODEL)
         context_id = request.form.get('context_id', 'general')
         
-        # Use selected model or fall back to default
         selected_model = models.get(model_id)
-        if selected_model is None:
-            selected_model = models.get(DEFAULT_MODEL)
-            model_id = DEFAULT_MODEL
-            if selected_model is None:
-                flash("No models available. Please contact administrator.", "danger")
-                return redirect(url_for('index'))
-        
+
         logger.info(f"Using model: {model_id}, Context: {context_id}")
         logger.info(f"Form data received: {request.form}")
 
@@ -426,21 +490,57 @@ def predict():
             'stroke': 0
         }
 
+        # Validate input data ranges
         for key in ['age', 'avg_glucose_level', 'bmi']:
             min_val, max_val = VALID_RANGES[key]
             if not (min_val <= input_data[key] <= max_val):
                 flash(f"{key.replace('_', ' ').title()} should be between {min_val} and {max_val}", "danger")
                 return redirect(url_for('index'))
 
+        # Create a DataFrame with the input data
         input_df = pd.DataFrame([input_data])
+
+        # Apply feature engineering
         input_df = perform_feature_engineering(input_df)
 
+        # Ensure all expected columns are present
+        expected_features = [
+            'gender', 'age', 'hypertension', 'heart_disease', 'ever_married', 
+            'work_type', 'Residence_type', 'avg_glucose_level', 'bmi', 
+            'smoking_status', 'age_bmi_interaction', 'hypertension_heart_disease',
+            'age_group_Elderly', 'age_group_Middle-Aged', 'age_group_Senior', 
+            'age_group_Young', 'bmi_category_Normal', 'bmi_category_Obese', 
+            'bmi_category_Overweight', 'bmi_category_Underweight', 
+            'glucose_category_Diabetes', 'glucose_category_High Risk', 
+            'glucose_category_Low', 'glucose_category_Normal', 'glucose_category_Prediabetes'
+        ]
+        # Ensure all expected columns are present
+        missing_columns = [col for col in expected_features if col not in input_df.columns]
+        if missing_columns:
+            logger.error(f"Missing columns in the input data: {missing_columns}")
+            flash(f"Missing required features: {', '.join(missing_columns)}", "danger")
+            return redirect(url_for('index'))
+
+        # Keep only the expected features in the right order
+        input_df = input_df[expected_features]
+
         # Get prediction and probability
-        prediction = selected_model.predict(input_df)[0]
-        probabilities = selected_model.predict_proba(input_df)[0]
-        stroke_probability = probabilities[1]  # Probability of positive class (stroke)
-        
-        logger.info(f"Prediction: {prediction}, Probability: {stroke_probability}")
+        try:
+            prediction = selected_model.predict(input_df)[0]
+            probabilities = selected_model.predict_proba(input_df)[0]
+            stroke_probability = probabilities[1]
+        except Exception as e:
+            logger.error(f"Error during prediction: {e}")
+            flash("There was an error processing the prediction. Please try again.", "danger")
+            return redirect(url_for('index'))
+
+        logger.info(f"Model prediction: {prediction}")
+        logger.info(f"Predicted probabilities: {probabilities}")
+        logger.info(f"Stroke probability: {stroke_probability:.4f}")
+
+        # Optionally display to user
+        flash(f"Your estimated stroke probability is: {stroke_probability*100:.2f}%", "info")
+
 
         # Feature list for risk factor analysis
         features_list = [
@@ -456,37 +556,55 @@ def predict():
             input_data['smoking_status']
         ]
         
+        # Rest of the function remains the same...
         # Get risk factors and save prediction
+        # Get risk factors
         risk_factors = get_risk_factors(features_list)
-        save_prediction(features_list, prediction, stroke_probability, model_id, context_id)
         
-        # Generate risk comparison chart
-        risk_chart = create_risk_comparison_chart(stroke_probability)
-        
-        # Generate model performance chart
-        model_chart = create_model_comparison_chart(stroke_probability, MODELS[model_id]['metrics'])
-        
+        # Compute cumulative risk score
+        risk_score = compute_risk_score(risk_factors)
+        logger.info(f"Computed risk score: {risk_score}")
+
+        # Define risk threshold for flagging elevated risk
+        threshold_score = 10  # Example threshold score
+        adjusted_probability = stroke_probability
+        logger.info(f"Initial stroke probability: {stroke_probability:.4f}")
+        # Override the predicted probability if the risk score is above threshold
+        if stroke_probability < 0.45 and risk_score >= threshold_score:
+            flash("⚠️ Your clinical risk factors suggest elevated stroke risk, despite the model's low probability.", "warning")
+            if risk_score <= 10:
+                adjusted_probability = stroke_probability  # No adjustment for low risk
+            elif risk_score <= 20:
+                adjusted_probability = min(stroke_probability + 0.20, 1.0)  # Mild risk: small adjustment
+            elif risk_score <= 30:
+                adjusted_probability = min(stroke_probability + 0.40, 1.0)  # Moderate risk: moderate adjustment
+            else:
+                adjusted_probability = min(stroke_probability + 0.80, 1.0)  # High risk: significant adjustment
+        logger.info(f"Adjusted probability after risk score consideration: {adjusted_probability:.4f}")
         # Get personalized recommendations
-        recommendations = generate_personalized_recommendations(risk_factors, stroke_probability)
+        recommendations = generate_personalized_recommendations(risk_factors, adjusted_probability)
         
         # Determine risk category
-        risk_category, category_class = get_risk_category(stroke_probability * 100)
+        risk_category, category_class = get_risk_category(adjusted_probability * 100)
 
         # Store everything in session for the result page
         session['prediction'] = int(prediction)
-        session['probability'] = round(stroke_probability * 100, 1)
-        session['probability_no_stroke'] = round(probabilities[0] * 100, 1)
+        session['probability'] = round(adjusted_probability * 100, 1)
+        session['probability_no_stroke'] = round((1 - adjusted_probability) * 100, 1)
         session['risk_factors'] = risk_factors
         session['features'] = features_list
         session['risk_category'] = risk_category
         session['category_class'] = category_class
-        session['risk_chart'] = risk_chart
-        session['model_chart'] = model_chart
+        #session['risk_chart'] = risk_chart
+        #session['model_chart'] = model_chart
         session['recommendations'] = recommendations
         session['model_id'] = model_id
         session['context_id'] = context_id
         session['model_info'] = MODELS[model_id]
         session['context_info'] = CLINICAL_CONTEXTS[context_id]
+
+        print("Session data:", session)
+        logger.info(f"Session data: {session}")
 
         return redirect(url_for('result'))
 
@@ -499,41 +617,41 @@ def predict():
         flash(f"An error occurred: {str(e)}", "danger")
         logger.error(f"Error in prediction: {e}")
         return redirect(url_for('index'))
-
+    
 @app.route('/result')
 def result():
     # Retrieve all stored session data
-    prediction = session.get('prediction')
-    probability = session.get('probability')
-    probability_no_stroke = session.get('probability_no_stroke')
-    risk_factors = session.get('risk_factors', [])
-    risk_category = session.get('risk_category', 'Unknown')
-    category_class = session.get('category_class', 'text-secondary')
-    risk_chart = session.get('risk_chart', '')
-    model_chart = session.get('model_chart', '')
-    recommendations = session.get('recommendations', {'general': [], 'specific': []})
-    model_id = session.get('model_id', DEFAULT_MODEL)
-    context_id = session.get('context_id', 'general')
-    model_info = session.get('model_info', MODELS.get(DEFAULT_MODEL, {}))
-    context_info = session.get('context_info', CLINICAL_CONTEXTS.get('general', {}))
+    prediction = session['prediction']
+    probability = session['probability']
+    probability_no_stroke = session['probability_no_stroke']
+    risk_factors = session['risk_factors']
+    risk_category = session['risk_category']
+    category_class = session['category_class']
+    recommendations = session['recommendations']
+    model_info = session['model_info']
     
     # Convert model metrics to percentage for display
     display_metrics = {k: f"{v*100:.1f}%" for k, v in model_info.get('metrics', {}).items()}
     
-    # Render the enhanced result template
-    return render_template('result.html', 
-                          prediction=prediction, 
-                          probability=probability,
-                          probability_no_stroke=probability_no_stroke,
-                          risk_factors=risk_factors,
-                          risk_category=risk_category,
-                          category_class=category_class,
-                          risk_chart=risk_chart,
-                          model_chart=model_chart,
-                          recommendations=recommendations,
-                          model_info=model_info,
-                          context_info=context_info,
-                          model_metrics=display_metrics)
+    # Create the structured prediction data object
+    prediction_data = {
+        'prediction': prediction,
+        'probability': probability,
+        'probability_no_stroke': probability_no_stroke,
+        'risk_category': risk_category,
+        'category_class': category_class,
+        'model_metrics': display_metrics,
+        'risk_factors': risk_factors,
+        'recommendations': recommendations
+    }
+    # Log prediction_data to Flask logger
+    app.logger.debug("prediction_data: %s", prediction_data)
+    
+    # Optionally, print to console for quick debugging
+    print("prediction_data:", prediction_data)
+    
+    # Render the template with the structured data
+    return render_template('result.html', prediction_data=prediction_data)
 
 @app.route('/history')
 def history():
@@ -569,14 +687,6 @@ def get_context_recommendation():
         })
     else:
         return jsonify({'error': 'Context not found'}), 404
-
-@app.errorhandler(404)
-def page_not_found(e):
-    return render_template('error.html', error_code=404, message="Page not found"), 404
-
-@app.errorhandler(500)
-def server_error(e):
-    return render_template('error.html', error_code=500, message="Internal server error"), 500
 
 if __name__ == '__main__':
     app.run(debug=True)
