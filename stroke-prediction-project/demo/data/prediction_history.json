@@ -146,5 +146,285 @@
     "risk_category": "Very High",
     "model_used": "K-Nearest Neighbors",
     "clinical_context": "Emergency Screening"
+  },
+  {
+    "timestamp": "2025-04-14 04:43:35",
+    "features": {
+      "age": 55.0,
+      "avg_glucose_level": 191.0,
+      "bmi": 35.6,
+      "hypertension": "Yes",
+      "heart_disease": "No",
+      "gender": "Male",
+      "ever_married": "Yes",
+      "work_type": "Govt_job",
+      "residence_type": "Urban",
+      "smoking_status": "formerly smoked"
+    },
+    "prediction": 0,
+    "probability": 0.0,
+    "risk_category": "Very Low",
+    "model_used": "Logistic Regression",
+    "clinical_context": "General Hospital Screening"
+  },
+  {
+    "timestamp": "2025-04-14 05:02:07",
+    "features": {
+      "age": 22.0,
+      "avg_glucose_level": 185.6,
+      "bmi": 23.8,
+      "hypertension": "Yes",
+      "heart_disease": "No",
+      "gender": "Female",
+      "ever_married": "No",
+      "work_type": "Never_worked",
+      "residence_type": "Urban",
+      "smoking_status": "never smoked"
+    },
+    "prediction": 0,
+    "probability": 0.0,
+    "risk_category": "Very Low",
+    "model_used": "Logistic Regression",
+    "clinical_context": "General Hospital Screening"
+  },
+  {
+    "timestamp": "2025-04-14 05:20:27",
+    "features": {
+      "age": 23.0,
+      "avg_glucose_level": 190.0,
+      "bmi": 23.8,
+      "hypertension": "Yes",
+      "heart_disease": "No",
+      "gender": "Female",
+      "ever_married": "No",
+      "work_type": "Never_worked",
+      "residence_type": "Urban",
+      "smoking_status": "never smoked"
+    },
+    "prediction": 0,
+    "probability": 0.0,
+    "risk_category": "Very Low",
+    "model_used": "Logistic Regression",
+    "clinical_context": "General Hospital Screening"
+  },
+  {
+    "timestamp": "2025-04-14 05:52:35",
+    "features": {
+      "age": 68.0,
+      "avg_glucose_level": 195.0,
+      "bmi": 29.0,
+      "hypertension": "Yes",
+      "heart_disease": "No",
+      "gender": "Male",
+      "ever_married": "Yes",
+      "work_type": "Private",
+      "residence_type": "Urban",
+      "smoking_status": "never smoked"
+    },
+    "prediction": 0,
+    "probability": 0.0,
+    "risk_category": "Very Low",
+    "model_used": "Logistic Regression",
+    "clinical_context": "General Hospital Screening"
+  },
+  {
+    "timestamp": "2025-04-14 05:56:27",
+    "features": {
+      "age": 62.0,
+      "avg_glucose_level": 195.0,
+      "bmi": 30.0,
+      "hypertension": "Yes",
+      "heart_disease": "No",
+      "gender": "Male",
+      "ever_married": "Yes",
+      "work_type": "Govt_job",
+      "residence_type": "Urban",
+      "smoking_status": "never smoked"
+    },
+    "prediction": 0,
+    "probability": 0.0,
+    "risk_category": "Very Low",
+    "model_used": "Logistic Regression",
+    "clinical_context": "General Hospital Screening"
+  },
+  {
+    "timestamp": "2025-04-14 06:03:51",
+    "features": {
+      "age": 62.0,
+      "avg_glucose_level": 191.0,
+      "bmi": 30.0,
+      "hypertension": "Yes",
+      "heart_disease": "No",
+      "gender": "Male",
+      "ever_married": "Yes",
+      "work_type": "Govt_job",
+      "residence_type": "Urban",
+      "smoking_status": "never smoked"
+    },
+    "prediction": 0,
+    "probability": 0.0,
+    "risk_category": "Very Low",
+    "model_used": "Logistic Regression",
+    "clinical_context": "General Hospital Screening"
+  },
+  {
+    "timestamp": "2025-04-14 06:06:08",
+    "features": {
+      "age": 62.0,
+      "avg_glucose_level": 191.0,
+      "bmi": 30.0,
+      "hypertension": "Yes",
+      "heart_disease": "No",
+      "gender": "Male",
+      "ever_married": "Yes",
+      "work_type": "Govt_job",
+      "residence_type": "Urban",
+      "smoking_status": "formerly smoked"
+    },
+    "prediction": 0,
+    "probability": 0.0,
+    "risk_category": "Very Low",
+    "model_used": "Logistic Regression",
+    "clinical_context": "General Hospital Screening"
+  },
+  {
+    "timestamp": "2025-04-14 06:13:19",
+    "features": {
+      "age": 62.0,
+      "avg_glucose_level": 192.0,
+      "bmi": 36.6,
+      "hypertension": "Yes",
+      "heart_disease": "No",
+      "gender": "Male",
+      "ever_married": "Yes",
+      "work_type": "Govt_job",
+      "residence_type": "Urban",
+      "smoking_status": "formerly smoked"
+    },
+    "prediction": 0,
+    "probability": 0.0,
+    "risk_category": "Very Low",
+    "model_used": "Logistic Regression",
+    "clinical_context": "General Hospital Screening"
+  },
+  {
+    "timestamp": "2025-04-14 06:23:48",
+    "features": {
+      "age": 55.0,
+      "avg_glucose_level": 192.0,
+      "bmi": 36.6,
+      "hypertension": "Yes",
+      "heart_disease": "No",
+      "gender": "Male",
+      "ever_married": "Yes",
+      "work_type": "Govt_job",
+      "residence_type": "Urban",
+      "smoking_status": "formerly smoked"
+    },
+    "prediction": 0,
+    "probability": 0.0,
+    "risk_category": "Very Low",
+    "model_used": "Logistic Regression",
+    "clinical_context": "General Hospital Screening"
+  },
+  {
+    "timestamp": "2025-04-14 06:31:48",
+    "features": {
+      "age": 67.0,
+      "avg_glucose_level": 228.7,
+      "bmi": 36.6,
+      "hypertension": "No",
+      "heart_disease": "Yes",
+      "gender": "Male",
+      "ever_married": "Yes",
+      "work_type": "Private",
+      "residence_type": "Urban",
+      "smoking_status": "formerly smoked"
+    },
+    "prediction": 0,
+    "probability": 0.0,
+    "risk_category": "Very Low",
+    "model_used": "Logistic Regression",
+    "clinical_context": "General Hospital Screening"
+  },
+  {
+    "timestamp": "2025-04-14 06:35:58",
+    "features": {
+      "age": 67.0,
+      "avg_glucose_level": 200.0,
+      "bmi": 35.0,
+      "hypertension": "No",
+      "heart_disease": "Yes",
+      "gender": "Other",
+      "ever_married": "Yes",
+      "work_type": "Private",
+      "residence_type": "Urban",
+      "smoking_status": "formerly smoked"
+    },
+    "prediction": 0,
+    "probability": 0.0,
+    "risk_category": "Very Low",
+    "model_used": "Logistic Regression",
+    "clinical_context": "General Hospital Screening"
+  },
+  {
+    "timestamp": "2025-04-14 06:37:28",
+    "features": {
+      "age": 67.0,
+      "avg_glucose_level": 200.0,
+      "bmi": 35.0,
+      "hypertension": "No",
+      "heart_disease": "Yes",
+      "gender": "Other",
+      "ever_married": "Yes",
+      "work_type": "Private",
+      "residence_type": "Urban",
+      "smoking_status": "formerly smoked"
+    },
+    "prediction": 0,
+    "probability": 0.0,
+    "risk_category": "Very Low",
+    "model_used": "Gaussian Naive Bayes",
+    "clinical_context": "General Hospital Screening"
+  },
+  {
+    "timestamp": "2025-04-14 06:38:47",
+    "features": {
+      "age": 67.0,
+      "avg_glucose_level": 200.0,
+      "bmi": 36.0,
+      "hypertension": "No",
+      "heart_disease": "Yes",
+      "gender": "Male",
+      "ever_married": "Yes",
+      "work_type": "Private",
+      "residence_type": "Urban",
+      "smoking_status": "formerly smoked"
+    },
+    "prediction": 0,
+    "probability": 0.0,
+    "risk_category": "Very Low",
+    "model_used": "Gaussian Naive Bayes",
+    "clinical_context": "Emergency Screening"
+  },
+  {
+    "timestamp": "2025-04-14 07:16:50",
+    "features": {
+      "age": 82.0,
+      "avg_glucose_level": 208.3,
+      "bmi": 32.5,
+      "hypertension": "No",
+      "heart_disease": "Yes",
+      "gender": "Male",
+      "ever_married": "Yes",
+      "work_type": "Private",
+      "residence_type": "Rural",
+      "smoking_status": "Unknown"
+    },
+    "prediction": 0,
+    "probability": 0.275,
+    "risk_category": "Low",
+    "model_used": "Random Forest",
+    "clinical_context": "General Hospital Screening"
   }
 ]

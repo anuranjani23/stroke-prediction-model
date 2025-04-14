@@ -5,355 +5,353 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Stroke Risk Predictor</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.0/font/bootstrap-icons.css">
-    <style>
-        :root {
-            --primary-color: #4361ee;
-            --secondary-color: #3f37c9;
-            --accent-color: #4895ef;
-            --light-bg: #f8fafc;
-            --dark-text: #1e293b;
-            --light-text: #f8fafc;
-            --border-radius: 12px;
-            --box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
-            --transition: all 0.3s ease;
-        }
-        
-        body {
-            background: linear-gradient(135deg, #f6f9fc 0%, #eef1f5 100%);
-            color: var(--dark-text);
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-            line-height: 1.6;
-        }
-        
-        .navbar {
-            background: linear-gradient(90deg, #3a0ca3 0%, #4361ee 100%) !important;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            padding: 12px 0;
-        }
-        
-        .navbar-brand {
-            font-weight: 600;
-            font-size: 1.3rem;
-            letter-spacing: 0.5px;
-        }
-        
-        .nav-link {
-            font-weight: 500;
-            transition: var(--transition);
-            position: relative;
-            padding: 8px 16px !important;
-            margin: 0 4px;
-        }
-        
-        .nav-link.active::after {
-            content: '';
-            position: absolute;
-            width: 60%;
-            height: 3px;
-            background-color: white;
-            bottom: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            border-radius: 2px;
-        }
-        
-        .nav-link:hover:not(.active) {
-            transform: translateY(-2px);
-        }
-        
-        .card {
-            border: none;
-            border-radius: var(--border-radius);
-            box-shadow: var(--box-shadow);
-            transition: var(--transition);
-            overflow: hidden;
-            background-color: white;
-            margin-bottom: 2rem;
-        }
-        
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
-        }
-        
-        .custom-header {
-            background: linear-gradient(135deg, #4361ee 0%, #3a0ca3 100%);
-            color: white;
-            padding: 28px 24px;
-            border-radius: var(--border-radius) var(--border-radius) 0 0;
-            position: relative;
-        }
-        
-        .custom-header::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            right: 0;
-            width: 150px;
-            height: 150px;
-            background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M50 0 L100 50 L50 100 L0 50 Z' fill='rgba(255,255,255,0.1)'/%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-size: cover;
-            opacity: 0.5;
-        }
-        
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.0/font/bootstrap-icons.css">
+
+<style>
+    /* Custom Properties */
+    :root {
+        --primary-color: #4361ee;
+        --secondary-color: #3f37c9;
+        --accent-color: #4895ef;
+        --light-bg: #f8fafc;
+        --dark-text: #1e293b;
+        --light-text: #f8fafc;
+        --border-radius: 12px;
+        --box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        --transition: all 0.2s ease-out;
+        --max-width: 1400px;
+    }
+
+    /* Base Styles */
+    *,
+    *::before,
+    *::after {
+        box-sizing: border-box;
+    }
+
+    body {
+        background: linear-gradient(135deg, #f6f9fc 0%, #eef1f5 100%) fixed;
+        color: var(--dark-text);
+        font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        line-height: 1.6;
+        margin: 0;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+
+    /* Typography */
+    h1, h2, h3, h4, h5, h6 {
+        margin-top: 0;
+        font-weight: 600;
+        color: var(--dark-text);
+    }
+
+    /* Layout */
+    .container {
+        max-width: var(--max-width);
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+
+    /* Navbar */
+    .navbar {
+        background: linear-gradient(90deg, #3a0ca3, #4361ee) !important;
+        box-shadow: var(--box-shadow);
+        padding: 0.75rem 0;
+    }
+
+    .navbar-brand {
+        font-weight: 600;
+        font-size: 1.25rem;
+        letter-spacing: 0.5px;
+        color: var(--light-text);
+    }
+
+    .nav-link {
+        font-weight: 500;
+        color: var(--light-text) !important;
+        padding: 0.5rem 1rem !important;
+        position: relative;
+        transition: var(--transition);
+    }
+
+    .nav-link.active::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        width: 50%;
+        height: 2px;
+        background: var(--light-text);
+        transform: translateX(-50%);
+        border-radius: 2px;
+    }
+
+    .nav-link:hover:not(.active) {
+        opacity: 0.9;
+        transform: translateY(-1px);
+    }
+
+    /* Cards */
+    .card {
+        border: none;
+        border-radius: var(--border-radius);
+        box-shadow: var(--box-shadow);
+        background: white;
+        margin-bottom: 1.5rem;
+        transition: var(--transition);
+        will-change: transform;
+    }
+
+    .card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+    }
+
+    .custom-header {
+        background: linear-gradient(135deg, #4361ee, #3a0ca3);
+        color: var(--light-text);
+        padding: 1.5rem;
+        border-radius: var(--border-radius) var(--border-radius) 0 0;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .custom-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 120px;
+        height: 120px;
+        background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M50 0 L100 50 L50 100 L0 50 Z' fill='rgba(255,255,255,0.1)'/%3E%3C/svg%3E");
+        opacity: 0.4;
+    }
+
+    .custom-header h2 {
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin: 0;
+        position: relative;
+        z-index: 1;
+    }
+
+    .card-body {
+        padding: 1.5rem;
+    }
+
+    /* Forms */
+    .form-label {
+        font-weight: 500;
+        color: #334155;
+        margin-bottom: 0.5rem;
+    }
+
+    .form-control,
+    .form-select {
+        border-radius: 8px;
+        border: 1px solid #cbd5e1;
+        padding: 0.625rem 1rem;
+        transition: var(--transition);
+    }
+
+    .form-control:focus,
+    .form-select:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+        outline: none;
+    }
+
+    .input-group-text {
+        background: #f1f5f9;
+        border-color: #cbd5e1;
+        color: #64748b;
+        font-weight: 500;
+    }
+
+    .form-group {
+        margin-bottom: 1.25rem;
+    }
+
+    .required-field::after {
+        content: "*";
+        color: #dc3545;
+        margin-left: 0.25rem;
+    }
+
+    /* Buttons */
+    .btn-primary {
+        background: linear-gradient(135deg, #4361ee, #3a0ca3);
+        border: none;
+        border-radius: 8px;
+        padding: 0.75rem 1.5rem;
+        font-weight: 600;
+        color: var(--light-text);
+        transition: var(--transition);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(67, 97, 238, 0.3);
+    }
+
+    .btn-primary::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+        transition: left 0.4s;
+    }
+
+    .btn-primary:hover::before {
+        left: 100%;
+    }
+
+    /* Sections */
+    .section-title {
+        color: var(--primary-color);
+        font-weight: 600;
+        font-size: 1.25rem;
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+        position: relative;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    .section-title::after {
+        content: '';
+        position: absolute;
+        bottom: -1px;
+        left: 0;
+        width: 50px;
+        height: 2px;
+        background: var(--primary-color);
+    }
+
+    /* Animations */
+    .form-section {
+        animation: fadeIn 0.5s ease-out;
+    }
+
+    @keyframes fadeIn {
+        0% { opacity: 0; transform: translateY(8px); }
+        100% { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Progress */
+    .progress-container {
+        background: #f1f5f9;
+        height: 6px;
+        border-radius: 3px;
+        margin-bottom: 1.5rem;
+        overflow: hidden;
+    }
+
+    .progress-bar {
+        height: 100%;
+        background: linear-gradient(90deg, #4361ee, #3a0ca3);
+        border-radius: 3px;
+        transition: width 0.3s ease;
+    }
+
+    /* Models */
+    .model-card {
+        border: 1px solid #e2e8f0;
+        border-radius: 10px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        transition: var(--transition);
+        cursor: pointer;
+    }
+
+    .model-card:hover {
+        border-color: var(--primary-color);
+        box-shadow: 0 4px 12px rgba(67, 97, 238, 0.1);
+    }
+
+    .model-card.selected {
+        border-color: var(--primary-color);
+        background: rgba(67, 97, 238, 0.05);
+    }
+
+    .context-badge {
+        font-size: 0.75rem;
+        padding: 0.3rem 0.6rem;
+        border-radius: 1rem;
+        margin-right: 0.5rem;
+        background: #f1f5f9;
+        color: #64748b;
+        transition: var(--transition);
+    }
+
+    .context-badge.selected {
+        background: var(--primary-color);
+        color: var(--light-text);
+    }
+
+    /* Footer */
+    footer {
+        background: linear-gradient(90deg, #3a0ca3, #4361ee);
+        padding: 1.5rem 0;
+        color: var(--light-text);
+        box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    footer p {
+        margin: 0;
+        font-weight: 500;
+    }
+
+    /* Accessibility */
+    .sr-only {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        border: 0;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
         .custom-header h2 {
-            font-weight: 700;
-            margin-bottom: 8px;
-            font-size: 1.8rem;
-            position: relative;
-            z-index: 1;
+            font-size: 1.25rem;
         }
-        
+
         .card-body {
-            padding: 2rem;
+            padding: 1rem;
         }
-        
-        .form-label {
-            font-weight: 500;
-            margin-bottom: 8px;
-            color: #334155;
-        }
-        
-        .form-control, .form-select {
-            border-radius: 8px;
-            padding: 10px 16px;
-            border: 1px solid #cbd5e1;
-            transition: var(--transition);
-        }
-        
-        .form-control:focus, .form-select:focus {
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.25);
-        }
-        
-        .input-group {
-            border-radius: 8px;
-            overflow: hidden;
-        }
-        
-        .input-group-text {
-            background-color: #f1f5f9;
-            border-color: #cbd5e1;
-            color: #64748b;
-            font-weight: 500;
-        }
-        
-        .form-group {
-            margin-bottom: 1.75rem;
-        }
-        
-        .info-tooltip {
-            cursor: pointer;
-            color: #64748b;
-            transition: var(--transition);
+
+        .navbar-brand {
             font-size: 1.1rem;
         }
-        
-        .info-tooltip:hover {
-            color: var(--primary-color);
+
+        .nav-link {
+            padding: 0.5rem 0.75rem !important;
         }
-        
-        .required-field::after {
-            content: "*";
-            color: #ef4444;
-            margin-left: 5px;
-        }
-        
-        .section-title {
-            color: var(--primary-color);
-            font-weight: 600;
-            margin-bottom: 1.5rem;
-            padding-bottom: 8px;
-            border-bottom: 2px solid #e2e8f0;
-            position: relative;
-        }
-        
-        .section-title::after {
-            content: '';
-            position: absolute;
-            bottom: -2px;
-            left: 0;
-            width: 60px;
-            height: 2px;
-            background-color: var(--primary-color);
-        }
-        
-        .form-check-input:checked {
-            background-color: var(--primary-color);
-            border-color: var(--primary-color);
-        }
-        
-        .btn-primary {
-            background: linear-gradient(135deg, #4361ee 0%, #3a0ca3 100%);
-            border: none;
-            border-radius: 8px;
-            padding: 12px 24px;
-            font-weight: 600;
-            letter-spacing: 0.5px;
-            transition: var(--transition);
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(67, 97, 238, 0.3);
-        }
-        
-        .btn-primary::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-            transition: 0.5s;
-        }
-        
-        .btn-primary:hover::before {
-            left: 100%;
-        }
-        
-        .notice-card {
-            background-color: #ebf5ff;
-            border-left: 4px solid var(--primary-color);
-        }
-        
-        .notice-icon {
-            color: var(--primary-color);
-            font-size: 1.8rem;
-        }
-        
-        footer {
-            background: linear-gradient(90deg, #3a0ca3 0%, #4361ee 100%);
-            padding: 24px 0;
-            box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.1);
-        }
-        
-        footer p {
-            font-weight: 500;
-            letter-spacing: 0.5px;
-        }
-        
-        .alert {
-            border-radius: var(--border-radius);
-            border: none;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-        }
-        
-        hr {
-            opacity: 0.15;
-            margin: 2rem 0;
-        }
-        
-        /* Form section animations */
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .card:hover,
+        .btn-primary:hover,
+        .nav-link:hover,
         .form-section {
-            animation: fadeIn 0.6s ease-out;
+            transform: none;
+            transition: none;
         }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+
+        .btn-primary::before {
+            transition: none;
         }
-        
-        /* Radio button styling */
-        .radio-card {
-            display: flex;
-            margin-bottom: 0;
-        }
-        
-        .radio-card .form-check-input {
-            margin-top: 0.2rem;
-        }
-        
-        /* Progress indicator */
-        .progress-container {
-            background-color: #f1f5f9;
-            height: 8px;
-            border-radius: 4px;
-            margin-bottom: 2rem;
-            overflow: hidden;
-        }
-        
-        .progress-bar {
-            height: 100%;
-            background: linear-gradient(90deg, #4361ee, #3a0ca3);
-            width: 0;
-            transition: width 0.3s ease;
-            border-radius: 4px;
-        }
-        
-        /* Tooltip custom styling */
-        .tooltip .tooltip-inner {
-            background-color: #1e293b;
-            border-radius: 6px;
-            padding: 10px 15px;
-            max-width: 300px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-        }
-        
-        .tooltip .arrow::before {
-            border-top-color: #1e293b;
-        }
-        
-        /* Model & Clinical Context sections */
-        .model-card {
-            border: 1px solid #e2e8f0;
-            border-radius: 12px;
-            padding: 15px;
-            margin-bottom: 15px;
-            transition: all 0.3s ease;
-            cursor: pointer;
-        }
-        
-        .model-card:hover {
-            border-color: var(--primary-color);
-            box-shadow: 0 5px 15px rgba(67, 97, 238, 0.1);
-        }
-        
-        .model-card.selected {
-            border-color: var(--primary-color);
-            background-color: rgba(67, 97, 238, 0.05);
-            box-shadow: 0 5px 15px rgba(67, 97, 238, 0.15);
-        }
-        
-        .context-badge {
-            font-size: 0.8rem;
-            padding: 5px 10px;
-            border-radius: 20px;
-            margin-right: 10px;
-            background-color: #f1f5f9;
-            color: #64748b;
-            transition: all 0.3s ease;
-        }
-        
-        .context-badge.selected {
-            background-color: var(--primary-color);
-            color: white;
-        }
-        
-        .recommendation-box {
-            background-color: #f8fafc;
-            border-left: 3px solid var(--accent-color);
-            padding: 15px;
-            margin-top: 20px;
-            border-radius: 8px;
-            animation: fadeIn 0.5s ease-out;
-        }
-        
-        .model-metrics {
-            font-size: 0.85rem;
-            color: #64748b;
-        }
-        
-        .metric-value {
-            font-weight: 600;
-            color: var(--dark-text);
-        }
-    </style>
+    }
+</style>
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark">
@@ -404,7 +402,7 @@
                 </div>
                 
                 <form method="POST" action="/predict" id="predictionForm">
-                    <!-- NEW SECTION: Clinical Context -->
+                    <!-- Clinical Context -->
                     <div class="row form-section">
                         <div class="col-12">
                             <h4 class="section-title"><i class="bi bi-hospital me-2"></i>Clinical Context</h4>
@@ -429,7 +427,7 @@
                         </div>
                     </div>
                     
-                    <!-- NEW SECTION: Model Selection -->
+                    <!-- Model Selection -->
                     <div class="row form-section mt-4">
                         <div class="col-12">
                             <h4 class="section-title"><i class="bi bi-cpu me-2"></i>Prediction Model</h4>
@@ -439,10 +437,10 @@
                                 <div class="d-flex align-items-center mb-2">
                                     <i class="bi bi-lightbulb-fill text-warning me-2"></i>
                                     <strong>Recommended Model: </strong>
-                                    <span id="recommendedModelName" class="ms-2">K-Nearest Neighbors</span>
+                                    <span id="recommendedModelName">{{ models['logistic'].name }}</span>
                                 </div>
                                 <p class="small mb-0" id="recommendationExplanation">
-                                    KNN has the highest sensitivity (94.7%) and ROC AUC (95.9%), ensuring minimal missed stroke cases. This is crucial in emergency settings where missing a stroke case could be fatal.
+                                    Logistic Regression offers the best overall performance with balanced sensitivity (60%) and specificity (87.17%), making it ideal for general screening scenarios.
                                 </p>
                             </div>
                             
@@ -451,7 +449,7 @@
                                 <div class="col-md-6 mb-3">
                                     <div class="model-card" onclick="selectModel('{{ model_id }}')">
                                         <div class="d-flex align-items-center mb-2">
-                                            <input type="radio" name="model_id" id="model_{{ model_id }}" value="{{ model_id }}" class="form-check-input form-field me-2" {% if model_id == 'knn' %}checked{% endif %}>
+                                            <input type="radio" name="model_id" id="model_{{ model_id }}" value="{{ model_id }}" class="form-check-input form-field me-2" {% if model_id == 'logistic' %}checked{% endif %}>
                                             <label for="model_{{ model_id }}" class="form-check-label fw-bold mb-0">{{ model.name }}</label>
                                         </div>
                                         <p class="text-muted small mb-0">{{ model.best_for }}</p>
@@ -658,34 +656,28 @@
         // Form progress tracker
         const formFields = document.querySelectorAll('.form-field');
         const progressBar = document.getElementById('formProgress');
-        const totalFields = formFields.length;
         
         function updateProgress() {
             let filledFields = 0;
+            const uniqueFieldNames = new Set();
             
             formFields.forEach(field => {
+                uniqueFieldNames.add(field.name);
                 if (field.type === 'radio') {
-                    // For radio buttons, check if any in the group is selected
                     const name = field.name;
-                    const radioGroup = document.querySelectorAll(`input[name="${name}"]:checked`);
-                } else {
-                    // For regular inputs
-                    if (field.value.trim() !== '' && !field.disabled) {
+                    const radioGroup = document.querySelector(`input[name="${name}"]:checked`);
+                    if (radioGroup) {
                         filledFields++;
                     }
+                } else if (field.value.trim() !== '' && !field.disabled) {
+                    filledFields++;
                 }
             });
             
-            // Calculate unique fields by filtering out duplicates (e.g., radio button groups)
-            const uniqueFieldNames = new Set();
-            formFields.forEach(field => uniqueFieldNames.add(field.name));
             const uniqueFieldCount = uniqueFieldNames.size;
-            
-            // Update progress bar
             const progressPercentage = (filledFields / uniqueFieldCount) * 100;
             progressBar.style.width = `${progressPercentage}%`;
             
-            // Add visual feedback for progress
             if (progressPercentage < 33) {
                 progressBar.style.background = 'linear-gradient(90deg, #f43f5e, #fb7185)';
             } else if (progressPercentage < 66) {
@@ -699,93 +691,40 @@
         
         // Model and clinical context selection
         const modelCards = document.querySelectorAll('.model-card');
-        const contextRadios = document.querySelectorAll('input[name="context_id"]');
-        const modelRadios = document.querySelectorAll('input[name="model_id"]');
         const recommendedModelName = document.getElementById('recommendedModelName');
         const recommendationExplanation = document.getElementById('recommendationExplanation');
         
-        // Clinical context data (this would typically come from the backend)
-        const clinicalContexts = {
-            'general': {
-                name: 'General Practice',
-                recommended_model: 'knn',
-                explanation: 'KNN has the highest sensitivity (94.7%) and ROC AUC (95.9%), ensuring minimal missed stroke cases while maintaining high specificity.',
-            },
-            'emergency': {
-                name: 'Emergency Department',
-                recommended_model: 'knn',
-                explanation: 'KNN has the highest sensitivity (94.7%), ensuring minimal missed stroke cases. This is crucial in emergency settings where missing a stroke case could be fatal.',
-            },
-            'primary': {
-                name: 'Primary Care',
-                recommended_model: 'rf',
-                explanation: 'Random Forest provides good overall balance (89.8% accuracy, 92.4% sensitivity) with robust performance across diverse patient populations common in primary care.',
-            }
-        };
-        
-        // Model data (this would typically come from the backend)
-        const models = {
-            'knn': {
-                name: 'K-Nearest Neighbors',
-                metrics: {
-                    accuracy: 0.878,
-                    recall: 0.947,
-                    specificity: 0.895,
-                    roc_auc: 0.959
-                }
-            },
-            'rf': {
-                name: 'Random Forest',
-                metrics: {
-                    accuracy: 0.898,
-                    recall: 0.924,
-                    specificity: 0.901,
-                    roc_auc: 0.953
-                }
-            },
-    
-            'logistic': {
-                name: 'Logistic Regression',
-                metrics: {
-                    accuracy: 0.859,
-                    recall: 0.901,
-                    specificity: 0.867,
-                    roc_auc: 0.924
-                }
-            }
-        };
-        
         function selectContext(contextId) {
-            // Update radio button
             document.getElementById(`context_${contextId}`).checked = true;
             
-            // Update model recommendation
-            const context = clinicalContexts[contextId];
-            const recommendedModel = models[context.recommended_model];
+            // Fetch recommended model from API
+            fetch(`/api/context_recommendation?context_id=${contextId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        console.error('Error fetching recommendation:', data.error);
+                        return;
+                    }
+                    recommendedModelName.textContent = MODELS[data.recommended_model].name;
+                    recommendationExplanation.textContent = data.explanation;
+                    
+                    // Highlight recommended model
+                    document.getElementById(`model_${data.recommended_model}`).checked = true;
+                    modelCards.forEach(card => {
+                        card.classList.remove('selected');
+                        if (card.querySelector(`input[value="${data.recommended_model}"]`)) {
+                            card.classList.add('selected');
+                        }
+                    });
+                })
+                .catch(error => console.error('Error:', error));
             
-            recommendedModelName.textContent = recommendedModel.name;
-            recommendationExplanation.textContent = context.explanation;
-            
-            // Highlight the recommended model
-            highlightRecommendedModel(context.recommended_model);
-            
-            // Update all model cards
-            modelCards.forEach(card => {
-                card.classList.remove('selected');
-                if (card.querySelector(`input[value="${context.recommended_model}"]`)) {
-                    card.classList.add('selected');
-                }
-            });
-            
-            // Update progress
             updateProgress();
         }
         
         function selectModel(modelId) {
-            // Update radio button
             document.getElementById(`model_${modelId}`).checked = true;
             
-            // Update all model cards
             modelCards.forEach(card => {
                 card.classList.remove('selected');
                 if (card.querySelector(`input[value="${modelId}"]`)) {
@@ -793,45 +732,27 @@
                 }
             });
             
-            // Update progress
             updateProgress();
         }
         
-        function highlightRecommendedModel(modelId) {
-            // Select the recommended model's radio
-            document.getElementById(`model_${modelId}`).checked = true;
-            
-            // Highlight the card
-            modelCards.forEach(card => {
-                card.classList.remove('selected');
-                if (card.querySelector(`input[value="${modelId}"]`)) {
-                    card.classList.add('selected');
-                }
-            });
-        }
-        
-        // Form validation enhancement
+        // Form validation
         const predictionForm = document.getElementById('predictionForm');
         
         predictionForm.addEventListener('submit', function(event) {
-            // Check if all required fields are filled
             const requiredFields = document.querySelectorAll('[required]');
             let isValid = true;
             
             requiredFields.forEach(field => {
                 if (field.type === 'radio') {
-                    // For radio buttons, check if any in the group is selected
                     const name = field.name;
                     const radioGroup = document.querySelectorAll(`input[name="${name}"]:checked`);
                     if (radioGroup.length === 0) {
                         isValid = false;
                         highlightFieldError(field.closest('.form-group'));
                     }
-                } else {
-                    if (!field.value.trim()) {
-                        isValid = false;
-                        highlightFieldError(field);
-                    }
+                } else if (!field.value.trim()) {
+                    isValid = false;
+                    highlightFieldError(field);
                 }
             });
             
@@ -842,38 +763,36 @@
         });
         
         function highlightFieldError(field) {
-            // Add visual feedback for error
             field.classList.add('is-invalid');
             
-            // For groups, highlight the whole group
             if (field.classList.contains('form-group')) {
                 field.querySelectorAll('input, select').forEach(input => {
                     input.classList.add('is-invalid');
                 });
             }
             
-            // Remove error highlighting when user corrects the field
-            field.addEventListener('input', function() {
+            field.addEventListener('input', function handler() {
                 field.classList.remove('is-invalid');
                 if (field.classList.contains('form-group')) {
                     field.querySelectorAll('input, select').forEach(input => {
                         input.classList.remove('is-invalid');
                     });
                 }
+                field.removeEventListener('input', handler);
             });
             
-            field.addEventListener('change', function() {
+            field.addEventListener('change', function handler() {
                 field.classList.remove('is-invalid');
                 if (field.classList.contains('form-group')) {
                     field.querySelectorAll('input, select').forEach(input => {
                         input.classList.remove('is-invalid');
                     });
                 }
+                field.removeEventListener('change', handler);
             });
         }
         
         function showValidationError() {
-            // Create alert message
             const alertDiv = document.createElement('div');
             alertDiv.className = 'alert alert-danger alert-dismissible fade show mt-3';
             alertDiv.role = 'alert';
@@ -883,37 +802,24 @@
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             `;
             
-            // Insert at top of form
             predictionForm.insertBefore(alertDiv, predictionForm.firstChild);
             
-            // Scroll to top of form
             window.scrollTo({
                 top: predictionForm.offsetTop - 100,
                 behavior: 'smooth'
             });
             
-            // Auto-dismiss after 5 seconds
             setTimeout(() => {
                 const bsAlert = new bootstrap.Alert(alertDiv);
                 bsAlert.close();
             }, 5000);
         }
         
-        // Add event listeners for all form fields to track progress
-        formFields.forEach(field => {
-            field.addEventListener('input', updateProgress);
-            field.addEventListener('change', updateProgress);
-        });
-        
-        // Initialize form selections and progress
+        // Initialize form
         document.addEventListener('DOMContentLoaded', function() {
-            // Set default context and model
             selectContext('general');
-            
-            // Calculate initial progress
             updateProgress();
             
-            // Add form validation styles
             document.querySelectorAll('.form-control, .form-select').forEach(el => {
                 el.addEventListener('invalid', function() {
                     this.classList.add('is-invalid');
@@ -924,6 +830,11 @@
                         this.classList.remove('is-invalid');
                     }
                 });
+            });
+            
+            formFields.forEach(field => {
+                field.addEventListener('input', updateProgress);
+                field.addEventListener('change', updateProgress);
             });
         });
     </script>

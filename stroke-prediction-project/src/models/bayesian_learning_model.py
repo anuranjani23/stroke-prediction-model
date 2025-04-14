@@ -16,7 +16,7 @@ def recall_specificity_score(y_true, y_pred):
     tn, fp, fn, tp = confusion_matrix(y_true, y_pred).ravel()
     specificity = tn / (tn + fp) if (tn + fp) > 0 else 0
     # Weighted custom score
-    return 0.99999999 * recall + 0.000000001 * specificity
+    return 0.9999999999 * recall + 0.00000001 * specificity
 # Setting up the logging to display important information during execution:
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s: %(message)s')
 logger = logging.getLogger(__name__)

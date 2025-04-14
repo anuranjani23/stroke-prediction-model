@@ -1,87 +1,93 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Stroke Prediction Results</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.0/font/bootstrap-icons.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        .result-card {
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-            transition: all 0.3s ease;
+        :root {
+            --primary-color: #4361ee;
+            --secondary-color: #3f37c9;
+            --accent-color: #4895ef;
+            --light-bg: #f8fafc;
+            --dark-text: #1e293b;
+            --light-text: #f8fafc;
+            --border-radius: 12px;
+            --box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+            --transition: all 0.3s ease;
         }
-        .result-card:hover {
-            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+
+        body {
+            background: linear-gradient(135deg, #f6f9fc 0%, #eef1f5 100%);
+            color: var(--dark-text);
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            line-height: 1.6;
         }
-        .risk-meter {
-            height: 30px;
-            border-radius: 15px;
-            background: linear-gradient(to right, #28a745, #ffc107, #dc3545);
+
+        .navbar {
+            background: linear-gradient(90deg, #3a0ca3 0%, #4361ee 100%) !important;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            padding: 12px 0;
+        }
+
+        .navbar-brand {
+            font-weight: 600;
+            font-size: 1.3rem;
+            letter-spacing: 0.5px;
+        }
+
+        .nav-link {
+            font-weight: 500;
+            transition: var(--transition);
             position: relative;
-            margin: 20px 0;
+            padding: 8px 16px !important;
+            margin: 0 4px;
         }
-        .risk-indicator {
-            width: 20px;
-            height: 20px;
-            background-color: #343a40;
-            border-radius: 50%;
-            position: absolute;
-            top: 5px;
-            transform: translateX(-50%);
-            border: 2px solid white;
+
+        .nav-link:hover:not(.active) {
+            transform: translateY(-2px);
         }
-        .metric-card {
-            border-radius: 8px;
-            transition: transform 0.2s;
+
+        .result-card {
+            border: none;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            transition: var(--transition);
+            overflow: hidden;
+            background-color: white;
+            margin-bottom: 2rem;
         }
-        .metric-card:hover {
+
+        .result-card:hover {
             transform: translateY(-5px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
         }
-        .risk-factor-card {
-            border-left: 5px solid;
-            margin-bottom: 10px;
+
+        .card-header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: var(--light-text);
+            padding: 1.5rem;
+            border-radius: var(--border-radius) var(--border-radius) 0 0;
+            position: relative;
         }
-        .severity-high {
-            border-left-color: #dc3545;
+
+        .card-header h3 {
+            margin: 0;
+            font-weight: 700;
+            font-size: 1.5rem;
         }
-        .severity-moderate {
-            border-left-color: #ffc107;
-        }
-        .severity-low {
-            border-left-color: #28a745;
-        }
-        .severity-very-high {
-            border-left-color: #721c24;
-            background-color: #f8d7da;
-        }
-        .recommendation-section {
-            border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 15px;
-        }
-        .recommendation-urgent {
-            background-color: #f8d7da;
-            border-left: 5px solid #721c24;
-        }
-        .recommendation-specific {
-            background-color: #fff3cd;
-            border-left: 5px solid #856404;
-        }
-        .recommendation-general {
-            background-color: #d1ecf1;
-            border-left: 5px solid #0c5460;
-        }
-        .tooltip-info {
-            cursor: help;
-        }
+
         .probability-gauge {
             width: 200px;
             height: 200px;
-            margin: 0 auto;
+            margin: 2rem auto;
             position: relative;
         }
+
         .gauge-background {
             width: 100%;
             height: 100%;
@@ -91,12 +97,15 @@
             overflow: hidden;
             box-shadow: inset -2px -2px 6px rgba(0,0,0,0.1);
         }
+
         .gauge-fill {
             position: absolute;
             bottom: 0;
             width: 100%;
             background: linear-gradient(to top, #dc3545 0%, #ffc107 50%, #28a745 100%);
+            transition: height 1.5s ease-out;
         }
+
         .gauge-center {
             position: absolute;
             width: 70%;
@@ -111,46 +120,230 @@
             flex-direction: column;
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
+
         .probability-value {
             font-size: 2rem;
             font-weight: bold;
         }
-        .model-info-tooltip {
-            cursor: pointer;
+
+        .metric-card {
+            border-radius: 8px;
+            transition: transform 0.2s;
+            background-color: var(--light-bg);
+        }
+
+        .metric-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .risk-factor-card {
+            border-left: 5px solid;
+            margin-bottom: 1rem;
+            border-radius: 8px;
+            background-color: white;
+        }
+
+        .severity-high {
+            border-left-color: #dc3545;
+        }
+
+        .severity-moderate {
+            border-left-color: #ffc107;
+        }
+
+        .severity-low {
+            border-left-color: #28a745;
+        }
+
+        .severity-very-high {
+            border-left-color: #721c24;
+            background-color: #f8d7da;
+        }
+
+        .recommendation-section {
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .recommendation-urgent {
+            background-color: #f8d7da;
+            border-left: 5px solid #721c24;
+        }
+
+        .recommendation-specific {
+            background-color: #fff3cd;
+            border-left: 5px solid #856404;
+        }
+
+        .recommendation-general {
+            background-color: #d1ecf1;
+            border-left: 5px solid #0c5460;
+        }
+
+        .tooltip-info {
+            cursor: help;
+            color: #64748b;
+            transition: var(--transition);
+        }
+
+        .tooltip-info:hover {
+            color: var(--primary-color);
+        }
+
+        .alert {
+            border-radius: var(--border-radius);
+            border: none;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            border: none;
+            border-radius: 8px;
+            padding: 12px 24px;
+            font-weight: 600;
+            transition: var(--transition);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(67, 97, 238, 0.3);
+        }
+
+        .btn-secondary {
+            border-radius: 8px;
+            padding: 12px 24px;
+            font-weight: 600;
+        }
+
+        .btn-info {
+            border-radius: 8px;
+            padding: 12px 24px;
+            font-weight: 600;
+        }
+
+        .section-title {
+            color: var(--primary-color);
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #e2e8f0;
+            position: relative;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 60px;
+            height: 2px;
+            background-color: var(--primary-color);
+        }
+
+        footer {
+            background: linear-gradient(90deg, #3a0ca3 0%, #4361ee 100%);
+            padding: 24px 0;
+            box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        footer p {
+            font-weight: 500;
+            letter-spacing: 0.5px;
+        }
+
+        .chart-container {
+            width: 100%;
+            height: 300px;
+            margin: 0 auto;
+        }
+
+        .text-danger {
+            color: #dc3545!important;
+        }
+        
+        .text-warning {
+            color: #ffc107!important;
+        }
+        
+        .text-info {
+            color: #17a2b8!important;
+        }
+        
+        .text-success {
+            color: #28a745!important;
+        }
+
+        /* Tooltip custom styling */
+        .tooltip .tooltip-inner {
+            background-color: #1e293b;
+            border-radius: 6px;
+            padding: 10px 15px;
+            max-width: 300px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .tooltip .arrow::before {
+            border-top-color: #1e293b;
         }
     </style>
 </head>
 <body>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="bi bi-heart-pulse-fill me-2"></i>Stroke Risk Predictor
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/"><i class="bi bi-house-door me-1"></i>Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/history"><i class="bi bi-clock-history me-1"></i>History</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/about"><i class="bi bi-info-circle me-1"></i>About</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
     <div class="container py-5">
         <h1 class="mb-4 text-center">Stroke Risk Assessment Results</h1>
         
         <div class="row mb-5">
-            <!-- Left column with prediction result -->
+            <!-- Left column with prediction result and model info -->
             <div class="col-lg-6">
+                <!-- Prediction Result -->
                 <div class="result-card card mb-4">
-                    <div class="card-header bg-primary text-white">
-                        <h3 class="card-title mb-0">Prediction Result</h3>
+                    <div class="card-header">
+                        <h3><i class="bi bi-clipboard-pulse me-2"></i>Prediction Result</h3>
                     </div>
                     <div class="card-body text-center">
                         <div class="probability-gauge mb-4">
                             <div class="gauge-background">
-                                <!-- Height will be set by JavaScript based on probability -->
                                 <div class="gauge-fill" id="gauge-fill"></div>
                             </div>
                             <div class="gauge-center">
-                                <div class="probability-value {{ category_class }}">{{ probability }}%</div>
+                                <div class="probability-value" id="probability-value">Loading...</div>
                                 <div>Stroke Risk</div>
                             </div>
                         </div>
                         
-                        <h4 class="mt-4">Risk Category: <span class="{{ category_class }}">{{ risk_category }}</span></h4>
+                        <h4>Risk Category: <span id="risk-category">Loading...</span></h4>
                         
                         <div class="row mt-4">
                             <div class="col-6">
                                 <div class="card bg-light">
                                     <div class="card-body text-center">
                                         <h5>Stroke Risk</h5>
-                                        <h2 class="{{ category_class }}">{{ probability }}%</h2>
+                                        <h2 id="probability-display">Loading...</h2>
                                     </div>
                                 </div>
                             </div>
@@ -158,83 +351,73 @@
                                 <div class="card bg-light">
                                     <div class="card-body text-center">
                                         <h5>No Stroke Risk</h5>
-                                        <h2 class="text-success">{{ probability_no_stroke }}%</h2>
+                                        <h2 id="no-stroke-probability" class="text-success">Loading...</h2>
                                     </div>
                                 </div>
                             </div>
                         </div>
                         
-                        <div class="alert {{ 'alert-danger' if prediction == 1 else 'alert-success' }} mt-4">
-                            <h4 class="alert-heading">
-                                {% if prediction == 1 %}
-                                <i class="fas fa-exclamation-triangle mr-2"></i>Elevated Stroke Risk Detected
-                                {% else %}
-                                <i class="fas fa-check-circle mr-2"></i>Low Stroke Risk Detected
-                                {% endif %}
-                            </h4>
-                            <p>
-                                {% if prediction == 1 %}
-                                Our model has detected factors that suggest an elevated risk of stroke. Please consult with healthcare professionals.
-                                {% else %}
-                                Based on the information provided, your stroke risk appears to be relatively low. However, it's still important to maintain a healthy lifestyle.
-                                {% endif %}
-                            </p>
+                        <div class="alert mt-4" id="risk-alert">
+                            <h4 class="alert-heading" id="risk-heading">Analyzing Results...</h4>
+                            <p id="risk-message">Please wait while we analyze your results.</p>
                         </div>
                     </div>
                 </div>
                 
-                <!-- Model performance metrics -->
+                <!-- Model Performance -->
                 <div class="result-card card">
-                    <div class="card-header bg-info text-white">
-                        <h3 class="card-title mb-0">
-                            Model Performance
-                            <span class="model-info-tooltip float-right" data-toggle="tooltip" title="These metrics represent how well our model performs on test data">
-                                <i class="fas fa-info-circle"></i>
-                            </span>
+                    <div class="card-header">
+                        <h3>
+                            <i class="bi bi-cpu me-2"></i>Model Performance
+                            <i class="bi bi-info-circle ms-2 tooltip-info" data-bs-toggle="tooltip" title="These metrics reflect the performance of our predictive model in a healthcare context"></i>
                         </h3>
                     </div>
                     <div class="card-body">
                         <div class="row">
                             <div class="col-6 col-md-3 mb-3">
-                                <div class="metric-card card bg-light h-100">
+                                <div class="metric-card card h-100">
                                     <div class="card-body text-center">
                                         <h6 class="card-title text-muted">Accuracy</h6>
-                                        <h4 class="mb-0">{{ model_metrics.accuracy }}</h4>
+                                        <h4 class="mb-0" id="accuracy-metric">95.2%</h4>
                                     </div>
                                 </div>
                             </div>
                             <div class="col-6 col-md-3 mb-3">
-                                <div class="metric-card card bg-light h-100">
+                                <div class="metric-card card h-100">
                                     <div class="card-body text-center">
                                         <h6 class="card-title text-muted">Precision</h6>
-                                        <h4 class="mb-0">{{ model_metrics.precision }}</h4>
+                                        <h4 class="mb-0" id="precision-metric">87.6%</h4>
                                     </div>
                                 </div>
                             </div>
                             <div class="col-6 col-md-3 mb-3">
-                                <div class="metric-card card bg-light h-100">
+                                <div class="metric-card card h-100">
                                     <div class="card-body text-center">
-                                        <h6 class="card-title text-muted">Recall</h6>
-                                        <h4 class="mb-0">{{ model_metrics.recall }}</h4>
+                                        <h6 class="card-title text-muted">Sensitivity</h6>
+                                        <h4 class="mb-0" id="recall-metric">83.4%</h4>
                                     </div>
                                 </div>
                             </div>
                             <div class="col-6 col-md-3 mb-3">
-                                <div class="metric-card card bg-light h-100">
+                                <div class="metric-card card h-100">
                                     <div class="card-body text-center">
-                                        <h6 class="card-title text-muted">F1 Score</h6>
-                                        <h4 class="mb-0">{{ model_metrics.f1_score }}</h4>
+                                        <h6 class="card-title text-muted">Specificity</h6>
+                                        <h4 class="mb-0" id="specificity-metric">92.8%</h4>
                                     </div>
                                 </div>
                             </div>
                         </div>
                         
-                        <div class="alert alert-secondary mt-3">
-                            <h5><i class="fas fa-chart-line mr-2"></i>What These Metrics Mean</h5>
-                            <p><strong>Accuracy:</strong> Overall correctness of predictions ({{model_metrics.accuracy}} of predictions are correct).</p>
-                            <p><strong>Precision:</strong> When we predict stroke risk, we're right {{model_metrics.precision}} of the time.</p>
-                            <p><strong>Recall:</strong> Of all actual stroke cases, we identify {{model_metrics.recall}} of them.</p>
-                            <p><strong>F1 Score:</strong> A balanced measure of precision and recall ({{model_metrics.f1_score}}).</p>
+                        <div class="chart-container mt-4">
+                            <canvas id="modelPerformanceChart"></canvas>
+                        </div>
+                        
+                        <div class="alert alert-info mt-3">
+                            <h5><i class="bi bi-info-circle-fill me-2"></i>About These Metrics</h5>
+                            <p><strong>Accuracy:</strong> <span id="accuracy-explanation">95.2%</span> of predictions are correct.</p>
+                            <p><strong>Precision:</strong> When stroke is predicted, it's correct <span id="precision-explanation">87.6%</span> of the time.</p>
+                            <p><strong>Sensitivity:</strong> <span id="recall-explanation">83.4%</span> of actual stroke cases are identified.</p>
+                            <p><strong>Specificity:</strong> <span id="specificity-explanation">92.8%</span> of non-stroke cases are correctly identified.</p>
                         </div>
                     </div>
                 </div>
@@ -242,92 +425,57 @@
             
             <!-- Right column with risk factors and recommendations -->
             <div class="col-lg-6">
-                <!-- Risk comparison chart -->
+                <!-- Risk Comparison -->
                 <div class="result-card card mb-4">
-                    <div class="card-header bg-secondary text-white">
-                        <h3 class="card-title mb-0">Risk Comparison</h3>
+                    <div class="card-header">
+                        <h3><i class="bi bi-bar-chart me-2"></i>Risk Comparison</h3>
                     </div>
                     <div class="card-body text-center">
-                        <img src="{{ risk_chart }}" alt="Risk Comparison Chart" class="img-fluid">
-                        <p class="mt-3">This chart shows how your stroke risk compares to the general population average of 5%.</p>
+                        <div class="chart-container">
+                            <canvas id="riskComparisonChart"></canvas>
+                        </div>
+                        <p class="mt-3">This chart compares your stroke risk to the population average by age group.</p>
                     </div>
                 </div>
             
-                <!-- Risk factors -->
+                <!-- Risk Factors -->
                 <div class="result-card card mb-4">
-                    <div class="card-header bg-warning text-dark">
-                        <h3 class="card-title mb-0">Identified Risk Factors</h3>
+                    <div class="card-header">
+                        <h3><i class="bi bi-exclamation-triangle me-2"></i>Identified Risk Factors</h3>
                     </div>
-                    <div class="card-body">
-                        {% if risk_factors %}
-                            {% for factor in risk_factors %}
-                                <div class="risk-factor-card card mb-2 severity-{{ factor.severity }}">
-                                    <div class="card-body">
-                                        <h5 class="card-title">
-                                            {{ factor.factor }}
-                                            {% if factor.severity == 'high' or factor.severity == 'very high' %}
-                                                <i class="fas fa-exclamation-triangle text-danger ml-2"></i>
-                                            {% endif %}
-                                        </h5>
-                                        <p class="card-text">{{ factor.detail }}</p>
-                                    </div>
-                                </div>
-                            {% endfor %}
-                        {% else %}
-                            <div class="alert alert-success">
-                                <i class="fas fa-check-circle mr-2"></i>No significant risk factors identified.
+                    <div class="card-body" id="risk-factors-container">
+                        <!-- Risk factors will be dynamically inserted here -->
+                        <div class="text-center">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Loading...</span>
                             </div>
-                        {% endif %}
+                            <p>Loading risk factors...</p>
+                        </div>
                         
                         <div class="alert alert-info mt-3">
-                            <h5><i class="fas fa-info-circle mr-2"></i>About Risk Factors</h5>
-                            <p>Risk factors are characteristics that increase your likelihood of stroke. 
-                            While some factors like age cannot be changed, many can be managed with proper care.</p>
+                            <h5><i class="bi bi-info-circle-fill me-2"></i>About Risk Factors</h5>
+                            <p>Risk factors increase your likelihood of stroke. While some, like age, are fixed, others can be managed with lifestyle changes or medical intervention.</p>
                         </div>
                     </div>
                 </div>
                 
                 <!-- Recommendations -->
                 <div class="result-card card">
-                    <div class="card-header bg-success text-white">
-                        <h3 class="card-title mb-0">Personalized Recommendations</h3>
+                    <div class="card-header">
+                        <h3><i class="bi bi-heart me-2"></i>Personalized Recommendations</h3>
                     </div>
-                    <div class="card-body">
-                        {% if recommendations.urgent %}
-                            <div class="recommendation-section recommendation-urgent">
-                                <h4><i class="fas fa-ambulance mr-2"></i>Urgent Actions</h4>
-                                <ul class="mb-0">
-                                    {% for rec in recommendations.urgent %}
-                                        <li>{{ rec }}</li>
-                                    {% endfor %}
-                                </ul>
+                    <div class="card-body" id="recommendations-container">
+                        <!-- Recommendations will be dynamically inserted here -->
+                        <div class="text-center">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Loading...</span>
                             </div>
-                        {% endif %}
-                        
-                        {% if recommendations.specific %}
-                            <div class="recommendation-section recommendation-specific">
-                                <h4><i class="fas fa-clipboard-list mr-2"></i>Specific Recommendations</h4>
-                                <ul class="mb-0">
-                                    {% for rec in recommendations.specific %}
-                                        <li>{{ rec }}</li>
-                                    {% endfor %}
-                                </ul>
-                            </div>
-                        {% endif %}
-                        
-                        <div class="recommendation-section recommendation-general">
-                            <h4><i class="fas fa-heart mr-2"></i>General Health Recommendations</h4>
-                            <ul class="mb-0">
-                                {% for rec in recommendations.general %}
-                                    <li>{{ rec }}</li>
-                                {% endfor %}
-                            </ul>
+                            <p>Generating recommendations...</p>
                         </div>
                         
                         <div class="alert alert-warning mt-3">
-                            <h5><i class="fas fa-exclamation-triangle mr-2"></i>Important Note</h5>
-                            <p>These recommendations are based on a predictive model and should not replace professional medical advice. 
-                            Please consult with healthcare professionals for personalized guidance.</p>
+                            <h5><i class="bi bi-exclamation-triangle-fill me-2"></i>Important Note</h5>
+                            <p>These recommendations are generated by a predictive model and do not replace professional medical advice. Consult a healthcare provider for personalized guidance.</p>
                         </div>
                     </div>
                 </div>
@@ -335,35 +483,336 @@
         </div>
         
         <div class="text-center mb-4">
-            <a href="/" class="btn btn-primary mr-2">New Prediction</a>
-            <a href="/history" class="btn btn-secondary mr-2">View History</a>
-            <a href="/about" class="btn btn-info">About This Tool</a>
+            <a href="/" class="btn btn-primary me-2"><i class="bi bi-arrow-repeat me-2"></i>New Prediction</a>
+            <a href="/history" class="btn btn-secondary me-2"><i class="bi bi-clock-history me-2"></i>View History</a>
+            <a href="/about" class="btn btn-info"><i class="bi bi-info-circle me-2"></i>About This Tool</a>
         </div>
     </div>
     
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js"></script>
+    <footer class="text-white py-4">
+        <div class="container text-center">
+            <p class="mb-2">© 2025 Stroke Risk Predictor | Developed for Health Monitoring</p>
+            <div class="mt-2">
+                <a href="/privacy" class="text-white-50 text-decoration-none me-3">Privacy Policy</a>
+                <a href="/terms" class="text-white-50 text-decoration-none me-3">Terms of Use</a>
+                <a href="/contact" class="text-white-50 text-decoration-none">Contact Us</a>
+            </div>
+        </div>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Add at the top of your script section -->
     <script>
-        $(document).ready(function() {
+        // Convert the Python data passed from Flask to a JavaScript object
+        const userData = JSON.parse('{{ prediction_data | tojson | safe }}');
+        console.log(userData);
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
             // Initialize tooltips
-            $('[data-toggle="tooltip"]').tooltip();
-            
-            // Set gauge fill height based on probability
-            const probability = ({ probability });
-            const gaugeHeight = 100 - probability;
-            $('#gauge-fill').css('height', probability + '%');
-            
-            // Highlight values based on risk level
-            if (probability >= 75) {
-                $('.probability-value').addClass('text-danger');
-            } else if (probability >= 50) {
-                $('.probability-value').addClass('text-warning');
-            } else if (probability >= 25) {
-                $('.probability-value').addClass('text-info');
-            } else {
-                $('.probability-value').addClass('text-success');
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl, {
+                    boundary: document.body,
+                    placement: 'top'
+                });
+            });
+    
+    
+            // Populate the page with dynamic data
+            function populatePage(userData) {
+                // Set basic probability values
+                document.getElementById('probability-value').innerText = userData.probability + '%';
+                document.getElementById('probability-display').innerText = userData.probability + '%';
+                document.getElementById('no-stroke-probability').innerText = userData.probability_no_stroke + '%';
+
+                // Set risk category
+                const riskCategoryElement = document.getElementById('risk-category');
+                riskCategoryElement.innerText = userData.risk_category;
+                riskCategoryElement.className = userData.category_class;  // Apply category class to change appearance
+
+                // Style probability display based on risk level
+                const probabilityDisplay = document.getElementById('probability-display');
+                probabilityDisplay.className = userData.category_class;  // Apply appropriate style for risk category
+
+                // Animate gauge fill
+                const gaugeFill = document.getElementById('gauge-fill');
+                gaugeFill.style.height = '0%';  // Start at 0
+                setTimeout(() => {
+                    gaugeFill.style.height = userData.probability + '%';  // Animate to actual value
+                }, 300);
+
+                // Set alert message based on prediction
+                const riskAlert = document.getElementById('risk-alert');
+                const riskHeading = document.getElementById('risk-heading');
+                const riskMessage = document.getElementById('risk-message');
+
+                // Ensure `riskCategoryElement.innerText` is used correctly in conditionals
+                if (riskCategoryElement.innerText === "Low") {
+                    riskHeading.innerHTML = '<i class="bi bi-check-circle-fill me-2"></i>Low Stroke Risk Detected';
+                    riskMessage.innerText = 'Based on the information provided, your stroke risk appears to be low. Continue maintaining a healthy lifestyle and regular check-ups.';
+                } else if (riskCategoryElement.innerText === "Mild") {
+                    riskHeading.innerHTML = '<i class="bi bi-check-circle-fill me-2"></i>Mild Stroke Risk Detected';
+                    riskMessage.innerText = 'Your stroke risk is mild. We recommend keeping an eye on risk factors and maintaining a healthy lifestyle.';
+                } else if (riskCategoryElement.innerText === "Moderate") {
+                    riskHeading.innerHTML = '<i class="bi bi-exclamation-triangle-fill me-2"></i>Elevated Stroke Risk Detected';
+                    riskMessage.innerText = 'Moderate risk detected. It is advisable to consult with healthcare professionals for a thorough evaluation.';
+                } else if (riskCategoryElement.innerText === "High") {
+                    riskHeading.innerHTML = '<i class="bi bi-exclamation-triangle-fill me-2"></i>Elevated Stroke Risk Detected';
+                    riskMessage.innerText = 'High stroke risk detected. Please consult with healthcare professionals immediately for a detailed assessment.';
+                } else if (riskCategoryElement.innerText === "Very High") {
+                    riskHeading.innerHTML = '<i class="bi bi-exclamation-triangle-fill me-2"></i>Elevated Stroke Risk Detected';
+                    riskMessage.innerText = 'Very high stroke risk detected. Immediate consultation with healthcare professionals is crucial.';
+                }
+
+                // Set model metrics
+                document.getElementById('accuracy-metric').innerText = userData.model_metrics.accuracy;
+                document.getElementById('precision-metric').innerText = userData.model_metrics.precision;
+                document.getElementById('recall-metric').innerText = userData.model_metrics.recall;
+                document.getElementById('specificity-metric').innerText = userData.model_metrics.specificity;
+
+                document.getElementById('accuracy-explanation').innerText = userData.model_metrics.accuracy;
+                document.getElementById('precision-explanation').innerText = userData.model_metrics.precision;
+                document.getElementById('recall-explanation').innerText = userData.model_metrics.recall;
+                document.getElementById('specificity-explanation').innerText = userData.model_metrics.specificity;
+
+                // Populate risk factors
+                const riskFactorsContainer = document.getElementById('risk-factors-container');
+                riskFactorsContainer.innerHTML = '';  // Clear loading indicator
+
+                if (userData.risk_factors && userData.risk_factors.length > 0) {
+                    userData.risk_factors.forEach(factor => {
+                        const factorElement = document.createElement('div');
+                        factorElement.className = `risk-factor-card card severity-${factor.severity}`;
+                        factorElement.innerHTML = `
+                            <div class="card-body">
+                                <h5 class="card-title">
+                                    ${factor.factor}
+                                    ${factor.severity === 'high' || factor.severity === 'very high' ? 
+                                        '<i class="bi bi-exclamation-triangle-fill text-danger ms-2"></i>' : ''}
+                                </h5>
+                                <p class="card-text">${factor.detail}</p>
+                            </div>
+                        `;
+                        riskFactorsContainer.appendChild(factorElement);
+                    });
+                } else {
+                    riskFactorsContainer.innerHTML = `
+                        <div class="alert alert-success">
+                            <i class="bi bi-check-circle-fill me-2"></i>No significant risk factors identified.
+                        </div>
+                    `;
+                }
+                
+                // Add the info alert back
+                riskFactorsContainer.innerHTML += `
+                    <div class="alert alert-info mt-3">
+                        <h5><i class="bi bi-info-circle-fill me-2"></i>About Risk Factors</h5>
+                        <p>Risk factors increase your likelihood of stroke. While some, like age, are fixed, others can be managed with lifestyle changes or medical intervention.</p>
+                    </div>
+                `;
+                
+                // Populate recommendations
+                const recommendationsContainer = document.getElementById('recommendations-container');
+                recommendationsContainer.innerHTML = ''; // Clear loading indicator
+                
+                if (userData.recommendations.urgent && userData.recommendations.urgent.length > 0) {
+                    const urgentSection = document.createElement('div');
+                    urgentSection.className = 'recommendation-section recommendation-urgent';
+                    urgentSection.innerHTML = `
+                        <h4><i class="bi bi-ambulance me-2"></i>Urgent Actions</h4>
+                        <ul class="mb-0">
+                            ${userData.recommendations.urgent.map(rec => `<li>${rec}</li>`).join('')}
+                        </ul>
+                    `;
+                    recommendationsContainer.appendChild(urgentSection);
+                }
+                
+                if (userData.recommendations.specific && userData.recommendations.specific.length > 0) {
+                    const specificSection = document.createElement('div');
+                    specificSection.className = 'recommendation-section recommendation-specific';
+                    specificSection.innerHTML = `
+                        <h4><i class="bi bi-clipboard-list me-2"></i>Specific Recommendations</h4>
+                        <ul class="mb-0">
+                            ${userData.recommendations.specific.map(rec => `<li>${rec}</li>`).join('')}
+                        </ul>
+                    `;
+                    recommendationsContainer.appendChild(specificSection);
+                }
+                
+                if (userData.recommendations.general && userData.recommendations.general.length > 0) {
+                    const generalSection = document.createElement('div');
+                    generalSection.className = 'recommendation-section recommendation-general';
+                    generalSection.innerHTML = `
+                        <h4><i class="bi bi-heart me-2"></i>General Health Recommendations</h4>
+                        <ul class="mb-0">
+                            ${userData.recommendations.general.map(rec => `<li>${rec}</li>`).join('')}
+                        </ul>
+                    `;
+                    recommendationsContainer.appendChild(generalSection);
+                }
+                
+                // Add the warning alert back
+                recommendationsContainer.innerHTML += `
+                    <div class="alert alert-warning mt-3">
+                        <h5><i class="bi bi-exclamation-triangle-fill me-2"></i>Important Note</h5>
+                        <p>These recommendations are generated by a predictive model and do not replace professional medical advice. Consult a healthcare provider for personalized guidance.</p>
+                    </div>
+                `;
+                
+                // Create the model performance chart
+                createModelPerformanceChart(userData.model_metrics);
+                
+                // Create the risk comparison chart
+                createRiskComparisonChart(userData.probability);
             }
+            
+            // Create Model Performance Chart
+            function createModelPerformanceChart(metrics) {
+                const ctx = document.getElementById('modelPerformanceChart').getContext('2d');
+                
+                // Convert percentage strings to numbers
+                const accuracy = parseFloat(metrics.accuracy);
+                const precision = parseFloat(metrics.precision);
+                const recall = parseFloat(metrics.recall);
+                const specificity = parseFloat(metrics.specificity);
+                
+                const modelChart = new Chart(ctx, {
+                    type: 'radar',
+                    data: {
+                        labels: ['Accuracy', 'Precision', 'Sensitivity', 'Specificity'],
+                        datasets: [{
+                            label: 'Model Performance',
+                            data: [accuracy, precision, recall, specificity],
+                            fill: true,
+                            backgroundColor: 'rgba(67, 97, 238, 0.2)',
+                            borderColor: 'rgba(67, 97, 238, 1)',
+                            pointBackgroundColor: 'rgba(67, 97, 238, 1)',
+                            pointBorderColor: '#fff',
+                            pointHoverBackgroundColor: '#fff',
+                            pointHoverBorderColor: 'rgba(67, 97, 238, 1)'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            r: {
+                                angleLines: {
+                                    display: true
+                                },
+                                suggestedMin: 50,
+                                suggestedMax: 100,
+                                ticks: {
+                                    stepSize: 10,
+                                    callback: function(value) {
+                                        return value + '%';
+                                    }
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                position: 'top'
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        return context.label + ': ' + context.raw + '%';
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+            
+            // Create Risk Comparison Chart
+    function createRiskComparisonChart(userProbability) {
+    const ctx = document.getElementById('riskComparisonChart').getContext('2d');
+
+    // Realistic stroke incidence data by age group (computed from your dataset)
+    const populationData = {
+        'Young': 0.13,
+        'Middle-Aged': 1.05,
+        'Senior': 4.97,
+        'Elderly': 13.57
+    };
+
+    const chartData = {
+        labels: ['Young', 'Middle-Aged', 'Senior', 'Elderly', 'Your Risk'],
+        datasets: [{
+            label: 'Stroke Risk (%)',
+            data: [
+                populationData['Young'],
+                populationData['Middle-Aged'],
+                populationData['Senior'],
+                populationData['Elderly'],
+                userProbability
+            ],
+            backgroundColor: [
+                'rgba(40, 167, 69, 0.5)',
+                'rgba(40, 167, 69, 0.5)',
+                'rgba(40, 167, 69, 0.5)',
+                'rgba(40, 167, 69, 0.5)',
+                'rgba(67, 97, 238, 0.7)' // Highlight user
+            ],
+            borderColor: [
+                'rgba(40, 167, 69, 1)',
+                'rgba(40, 167, 69, 1)',
+                'rgba(40, 167, 69, 1)',
+                'rgba(40, 167, 69, 1)',
+                'rgba(67, 97, 238, 1)' // Highlight user
+            ],
+            borderWidth: 1
+        }]
+    };
+
+    const riskComparisonChart = new Chart(ctx, {
+        type: 'bar',
+        data: chartData,
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 20,
+                    ticks: {
+                        callback: function(value) {
+                            return value + '%';
+                        }
+                    },
+                    title: {
+                        display: true,
+                        text: 'Stroke Risk (%)'
+                    }
+                },
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Age Group'
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return context.label + ': ' + context.raw + '%';
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
+
+            // Initialize the page with sample data
+            populatePage(userData);
         });
     </script>
-</body>
-</html>
+    </body>
+    </html>
