@@ -293,4 +293,7 @@ stroke-prediction-project
 - [Kaggle Dataset](https://www.kaggle.com/datasets/fedesoriano/stroke-prediction-dataset)
 - [MLPClassifier - sklearn docs](https://scikit-learn.org/stable/modules/generated/sklearn.neural_network.MLPClassifier.html)
 - [PowerTransformer - sklearn docs](https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.PowerTransformer.html)
-- [StandardScaler - sklearn docs][]
+- [StandardScaler - sklearn docs][ ]
+- [For understanding Pipeline With Hyperparameter Tuning][https://www.kaggle.com/code/hkalita/pipeline-with-hyperparameter-tuning]
+- [https://scikit-learn.org/stable/modules/grid_search.html]
+- [ColumnTransformer][https://machinelearningmastery.com/columntransformer-for-numerical-and-categorical-data/]
