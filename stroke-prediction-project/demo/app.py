@@ -8,9 +8,6 @@ import logging
 import pandas as pd
 import matplotlib
 matplotlib.use('Agg')
-import matplotlib.pyplot as plt
-import io
-import base64
 # Set up logging
 logging.basicConfig(
     level=logging.INFO,
@@ -51,7 +48,7 @@ MODELS = {
             'f1_score': 0.273,
             'auc': 0.81,
         },
-        'best_for': 'Consistent second-best performer in most scenarios',
+        'best_for': 'General hospital screening as well, also consistent best performer in most scenarios',
         'strengths': 'Good overall performance with strong specificity and feature importance insights',
         'limitations': 'Slightly lower sensitivity than logistic regression and Bayesian models'
     },
@@ -179,8 +176,8 @@ CLINICAL_CONTEXTS = {
     'balanced': {
         'name': 'Balanced Clinical Decision Support',
         'description': 'Optimized for balanced clinical decision making',
-        'recommended_model': 'logistic',
-        'explanation': 'Logistic Regression offers the best performance for balanced clinical decision support with good ROC AUC (83.32%) and interpretability.'
+        'recommended_model': 'random_forest',
+        'explanation': 'Random Forest offers the best performance for balanced clinical decision support with good ROC AUC (83.32%) and interpretability.'
     }
 }
 
@@ -190,11 +187,11 @@ RISK_WEIGHTS = {
     "Advanced age": 5.5,  # Over 65 years (severity: high if >75)
     "High blood glucose": 4,  # High glucose (severity: high if >200 mg/dL)
     "Obesity": 4,  # BMI over 30 (severity: high if >35)
-    "Hypertension": 3.5,  # Presence of hypertension
-    "Heart disease": 3.5,  # Presence of heart disease
+    "Hypertension": 4,  # Presence of hypertension
+    "Heart disease": 4,  # Presence of heart disease
     "Smoking": 4,  # Currently smoking
     "Former smoker": 2,  # Former smoker
-    "Hypertension + Heart disease": 6,  # Combined hypertension and heart disease
+    "Hypertension + Heart disease": 8,  # Combined hypertension and heart disease
 }
 
 # Function to compute the risk score from risk factors
@@ -689,4 +686,5 @@ def get_context_recommendation():
         return jsonify({'error': 'Context not found'}), 404
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    port = int(os.environ.get("PORT", 8080))  # default to 8080 if PORT isn't set
+    app.run(host='0.0.0.0', port=port, debug=True)
