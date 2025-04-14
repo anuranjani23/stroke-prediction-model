@@ -264,7 +264,11 @@ def get_risk_category(probability):
     else:
         return "Very High", "text-danger font-weight-bold"
 
-df = pd.read_csv("../data/raw/healthcare-dataset-stroke-data.csv")
+# Dynamically set the path to the data file
+data_path = os.path.join(os.path.dirname(__file__), '..', 'data', 'raw', 'healthcare-dataset-stroke-data.csv')
+
+# Read the CSV file
+df = pd.read_csv(data_path)
 # Population averages for comparison (these would be calculated from your dataset)
 POPULATION_AVERAGES = {
     'age': df['age'].mean(),
