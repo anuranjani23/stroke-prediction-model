@@ -265,7 +265,7 @@ def get_risk_category(probability):
         return "Very High", "text-danger font-weight-bold"
 
 # Dynamically set the path to the data file
-data_path = os.path.join(os.path.dirname(__file__), '..', 'data', 'raw', 'healthcare-dataset-stroke-data.csv')
+data_path = os.path.join(os.path.dirname(__file__), 'data', 'raw', 'healthcare-dataset-stroke-data.csv')
 
 # Read the CSV file
 df = pd.read_csv(data_path)
