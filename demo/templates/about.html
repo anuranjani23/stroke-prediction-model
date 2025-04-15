@@ -8,34 +8,38 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.0/font/bootstrap-icons.css">
     <style>
         :root {
-            --primary-color: #4361ee;
-            --secondary-color: #3f37c9;
-            --accent-color: #4895ef;
-            --light-bg: #f8fafc;
-            --dark-text: #1e293b;
-            --light-text: #f8fafc;
-            --border-radius: 12px;
-            --box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+            --primary-color: #0284c7;      /* Bright blue */
+            --secondary-color: #0369a1;    /* Darker blue */
+            --accent-color: #0ea5e9;       /* Sky blue */
+            --teal-accent: #0d9488;        /* Teal accent */
+            --light-teal: #14b8a6;         /* Light teal */
+            --light-bg: #f0f9ff;           /* Very light blue background */
+            --dark-text: #0f172a;          /* Very dark blue text */
+            --light-text: #f8fafc;         /* Off-white text */
+            --subtle-bg: #e0f2fe;          /* Subtle light blue */
+            --border-radius: 8px;          /* Slightly less rounded corners */
+            --box-shadow: 0 8px 24px rgba(7, 89, 133, 0.1);
             --transition: all 0.3s ease;
         }
         
         body {
-            background: linear-gradient(135deg, #f6f9fc 0%, #eef1f5 100%);
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
             color: var(--dark-text);
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
             line-height: 1.6;
         }
         
         .navbar {
-            background: linear-gradient(90deg, #3a0ca3 0%, #4361ee 100%) !important;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            background: linear-gradient(90deg, #0c4a6e 0%, #0369a1 100%) !important;
+            box-shadow: 0 4px 12px rgba(7, 89, 133, 0.15);
             padding: 12px 0;
         }
         
         .navbar-brand {
             font-weight: 600;
             font-size: 1.3rem;
-            letter-spacing: 0.5px;
+            letter-spacing: -0.01em;
+            color: var(--light-text);
         }
         
         .nav-link {
@@ -44,14 +48,15 @@
             position: relative;
             padding: 8px 16px !important;
             margin: 0 4px;
+            color: var(--light-text) !important;
         }
         
         .nav-link.active::after {
             content: '';
             position: absolute;
-            width: 60%;
+            width: 50%;
             height: 3px;
-            background-color: white;
+            background-color: var(--accent-color);
             bottom: 0;
             left: 50%;
             transform: translateX(-50%);
@@ -60,6 +65,7 @@
         
         .nav-link:hover:not(.active) {
             transform: translateY(-2px);
+            color: var(--accent-color) !important;
         }
         
         .card {
@@ -73,12 +79,12 @@
         }
         
         .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+            transform: translateY(-4px);
+            box-shadow: 0 12px 30px rgba(7, 89, 133, 0.15);
         }
         
         .custom-header {
-            background: linear-gradient(135deg, #4361ee 0%, #3f37c9 100%);
+            background: linear-gradient(135deg, #0284c7 0%, #0c4a6e 100%);
             color: white;
             padding: 28px 24px;
             border-radius: var(--border-radius) var(--border-radius) 0 0;
@@ -92,10 +98,10 @@
             right: 0;
             width: 150px;
             height: 150px;
-            background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M50 0 L100 50 L50 100 L0 50 Z' fill='rgba(255,255,255,0.1)'/%3E%3C/svg%3E");
+            background-image: url("data:image/svg+xml,%3Csvg width='120' height='120' viewBox='0 0 120 120' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M60 0 L120 60 L60 120 L0 60 Z' fill='rgba(14,165,233,0.1)'/%3E%3C/svg%3E");
             background-repeat: no-repeat;
             background-size: cover;
-            opacity: 0.5;
+            opacity: 0.6;
         }
         
         .custom-header h2 {
@@ -104,59 +110,61 @@
             font-size: 1.8rem;
             position: relative;
             z-index: 1;
+            letter-spacing: -0.01em;
         }
         
         .section-title {
-            color: var(--primary-color);
+            color: var(--secondary-color);
             font-weight: 600;
             margin-bottom: 1.5rem;
             padding-bottom: 10px;
-            border-bottom: 2px solid #e2e8f0;
+            border-bottom: 1px solid #e2e8f0;
             position: relative;
         }
         
         .section-title::after {
             content: '';
             position: absolute;
-            bottom: -2px;
+            bottom: -1px;
             left: 0;
             width: 60px;
-            height: 2px;
-            background-color: var(--primary-color);
+            height: 3px;
+            background: linear-gradient(90deg, var(--teal-accent), var(--accent-color));
+            border-radius: 3px;
         }
         
         .feature-icon {
             width: 4.5rem;
             height: 4.5rem;
-            border-radius: 1rem;
+            border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 2.25rem;
             color: white;
             margin: 0 auto 1rem;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+            box-shadow: 0 8px 20px rgba(7, 89, 133, 0.2);
             transition: var(--transition);
         }
         
         .card:hover .feature-icon {
-            transform: scale(1.1) rotate(5deg);
+            transform: scale(1.05) rotate(3deg);
         }
         
         .bg-primary-gradient {
-            background: linear-gradient(135deg, #4361ee 0%, #3f37c9 100%);
+            background: linear-gradient(135deg, #0284c7 0%, #0c4a6e 100%);
         }
         
         .bg-success-gradient {
-            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            background: linear-gradient(135deg, #0d9488 0%, #0f766e 100%);
         }
         
         .bg-danger-gradient {
-            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            background: linear-gradient(135deg, #0369a1 0%, #075985 100%);
         }
         
         .bg-warning-gradient {
-            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
         }
         
         .info-card {
@@ -171,7 +179,7 @@
             position: absolute;
             width: 100%;
             height: 100%;
-            background: linear-gradient(135deg, rgba(67, 97, 238, 0.05) 0%, rgba(58, 12, 163, 0.05) 100%);
+            background: linear-gradient(135deg, rgba(14, 165, 233, 0.05) 0%, rgba(7, 89, 133, 0.05) 100%);
             top: 0;
             left: 0;
             opacity: 0;
@@ -184,44 +192,58 @@
         }
         
         .model-card {
-            border-left: 4px solid var(--primary-color);
+            border-left: 4px solid var(--teal-accent);
             transition: var(--transition);
         }
         
         .model-card:hover {
-            background-color: #f8fafc;
+            background-color: var(--light-bg);
         }
         
         .notice-card {
-            background-color: #ebf5ff;
-            border-left: 4px solid var(--primary-color);
+            background-color: #e0f2fe;
+            border-left: 4px solid var(--accent-color);
         }
         
         .notice-icon {
-            color: var(--primary-color);
+            color: var(--secondary-color);
             font-size: 1.8rem;
         }
         
         footer {
-            background: linear-gradient(90deg, #3a0ca3 0%, #4361ee 100%);
+            background: linear-gradient(90deg, #0c4a6e 0%, #0369a1 100%);
             padding: 24px 0;
-            box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 -4px 12px rgba(7, 89, 133, 0.1);
+            color: var(--light-text);
         }
         
         footer p {
             font-weight: 500;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.02em;
+            opacity: 0.95;
+        }
+        
+        footer a {
+            color: var(--light-text);
+            text-decoration: none;
+            border-bottom: 1px dashed rgba(255, 255, 255, 0.4);
+            transition: var(--transition);
+        }
+        
+        footer a:hover {
+            color: var(--light-text);
+            border-bottom-color: var(--light-text);
         }
         
         /* Animation */
         @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(20px); }
+            from { opacity: 0; transform: translateY(15px); }
             to { opacity: 1; transform: translateY(0); }
         }
         
         .animate {
             opacity: 0;
-            animation: fadeInUp 0.6s ease-out forwards;
+            animation: fadeInUp 0.5s ease-out forwards;
         }
         
         .delay-1 { animation-delay: 0.1s; }
@@ -233,13 +255,29 @@
         /* Pulse animation for stroke icon */
         @keyframes pulse {
             0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
+            50% { transform: scale(1.03); }
             100% { transform: scale(1); }
         }
         
         .pulse-animation {
             animation: pulse 2s infinite ease-in-out;
         }
+        
+        /* Responsive improvements */
+        @media (max-width: 768px) {
+            .custom-header h2 {
+                font-size: 1.5rem;
+            }
+            
+            .feature-icon {
+                width: 4rem;
+                height: 4rem;
+                font-size: 2rem;
+            }
+        }
+        
+        /* Add Inter font for a more professional look */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
     </style>
 </head>
 <body>
