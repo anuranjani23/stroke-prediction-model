@@ -690,5 +690,4 @@ def get_context_recommendation():
         return jsonify({'error': 'Context not found'}), 404
 
 if __name__ == '__main__':
-    port = int(os.environ.get("PORT", 8080))  # default to 8080 if PORT isn't set
-    app.run(host='0.0.0.0', port=port, debug=True)
+    app.run(debug=False)  # Set debug=False for production
