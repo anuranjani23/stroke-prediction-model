@@ -180,7 +180,7 @@ Based on our analysis, we recommend:
    → Use Logistic Regression (efficient, good specificity)
 
 4. **For Balanced Clinical Decision Support**:
-   → Use Logistic Regression (good ROC AUC, interpretable)
+   → Use Random Forest (good ROC AUC, interpretable)
 
 ---
 
